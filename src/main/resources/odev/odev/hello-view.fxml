@@ -1,16 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="odev.odev.HelloController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<AnchorPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TrafficViewController">
+    <!-- Kavşak Alanı -->
+    <Pane fx:id="drawPane" prefHeight="800.0" prefWidth="800.0">
+        <!-- YOLLAR -->
+        <Rectangle fill="LIGHTGRAY" height="800.0" layoutX="370.0" layoutY="0.0" width="20.0" />
+        <Rectangle fill="LIGHTGRAY" height="800.0" layoutX="410.0" layoutY="0.0" width="20.0" />
+        <Rectangle fill="LIGHTGRAY" height="20.0" layoutX="0.0" layoutY="370.0" width="800.0" />
+        <Rectangle fill="LIGHTGRAY" height="20.0" layoutX="0.0" layoutY="410.0" width="800.0" />
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+        <!-- KAVŞAK -->
+        <Rectangle fill="DARKGRAY" height="60.0" layoutX="370.0" layoutY="370.0" width="60.0" />
+
+        <!-- TRAFİK IŞIKLARI (KÖŞELER) -->
+        <Group layoutX="350.0" layoutY="300.0">
+            <Rectangle fill="BLACK" height="45.0" width="15.0" />
+            <Circle fill="RED" layoutX="7.5" layoutY="7.5" radius="5.0" />
+            <Circle fill="GOLDENROD" layoutX="7.5" layoutY="22.5" radius="5.0" />
+            <Circle fill="DARKGREEN" layoutX="7.5" layoutY="37.5" radius="5.0" />
+        </Group>
+        <Group layoutX="430.0" layoutY="300.0">
+            <Rectangle fill="BLACK" height="45.0" width="15.0" />
+            <Circle fill="RED" layoutX="7.5" layoutY="7.5" radius="5.0" />
+            <Circle fill="GOLDENROD" layoutX="7.5" layoutY="22.5" radius="5.0" />
+            <Circle fill="DARKGREEN" layoutX="7.5" layoutY="37.5" radius="5.0" />
+        </Group>
+        <Group layoutX="350.0" layoutY="460.0">
+            <Rectangle fill="BLACK" height="45.0" width="15.0" />
+            <Circle fill="RED" layoutX="7.5" layoutY="7.5" radius="5.0" />
+            <Circle fill="GOLDENROD" layoutX="7.5" layoutY="22.5" radius="5.0" />
+            <Circle fill="DARKGREEN" layoutX="7.5" layoutY="37.5" radius="5.0" />
+        </Group>
+        <Group layoutX="430.0" layoutY="460.0">
+            <Rectangle fill="BLACK" height="45.0" width="15.0" />
+            <Circle fill="RED" layoutX="7.5" layoutY="7.5" radius="5.0" />
+            <Circle fill="GOLDENROD" layoutX="7.5" layoutY="22.5" radius="5.0" />
+            <Circle fill="DARKGREEN" layoutX="7.5" layoutY="37.5" radius="5.0" />
+        </Group>
+    </Pane>
+
+    <!-- KONTROL PANELİ -->
+    <VBox alignment="TOP_LEFT" layoutX="600.0" layoutY="50.0" prefHeight="401.0" prefWidth="162.0" spacing="10.0">
+        <Label text="Araç Sayısı" />
+        <Label text="North" />
+        <TextField fx:id="northField" text="0" />
+        <Label text="South" />
+        <TextField fx:id="southField" text="0" />
+        <Label text="East" />
+        <TextField fx:id="eastField" text="0" />
+        <Label text="West" />
+        <TextField fx:id="westField" text="0" />
+        <Button fx:id="randomButton" text="Rastgele Oluştur" />
+        <Button fx:id="calculateButton" text="Işık Sürelerini Hesapla" />
+        <Label text="Yeşil Işık Süreleri" />
+        <Label fx:id="northTime" text="North: 0 sn" />
+        <Label fx:id="southTime" text="South: 0 sn" />
+        <Label fx:id="eastTime" text="East: 0 sn" />
+        <Label fx:id="westTime" text="West: 0 sn" />
+    </VBox>
+</AnchorPane>

@@ -30,7 +30,7 @@ public class TrafficView {
 
         // Çift şeritli yollar
         Rectangle verticalIn = new Rectangle(370, 0, 20, 800);
-        Rectangle verticalOut = new Rectangle(370,400,20,800);
+        Rectangle verticalOut = new Rectangle(410, 0, 20, 800);
         Rectangle horizontalIn = new Rectangle(0, 370, 800, 20);
         Rectangle horizontalOut = new Rectangle(0, 410, 800, 20);
 
@@ -97,12 +97,12 @@ public class TrafficView {
         hesaplaBtn.setOnAction(e -> {
             int n = Integer.parseInt(northField.getText());
             int s = Integer.parseInt(southField.getText());
-            int ed = Integer.parseInt(eastField.getText());
+            int es = Integer.parseInt(eastField.getText());
             int w = Integer.parseInt(westField.getText());
 
             vehicleCounts.put("NORTH", n);
             vehicleCounts.put("SOUTH", s);
-            vehicleCounts.put("EAST", ed);
+            vehicleCounts.put("EAST", es);
             vehicleCounts.put("WEST", w);
 
             calculateDurations();
