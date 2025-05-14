@@ -30,7 +30,7 @@ public class TrafficView {
 
         // Çift şeritli yollar
         Rectangle verticalIn = new Rectangle(370, 0, 20, 800);
-        Rectangle verticalOut = new Rectangle(410, 0, 20, 800);
+        Rectangle verticalOut = new Rectangle(370,400,20,800);
         Rectangle horizontalIn = new Rectangle(0, 370, 800, 20);
         Rectangle horizontalOut = new Rectangle(0, 410, 800, 20);
 
