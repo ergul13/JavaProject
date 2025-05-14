@@ -13,6 +13,7 @@ public class Main extends Application {
         TrafficController controller = new TrafficController(manager);
         TrafficView view = new TrafficView(controller);
         view.start(stage);
+        int enes = 6;
     }
 
     public static void main(String[] args) {
