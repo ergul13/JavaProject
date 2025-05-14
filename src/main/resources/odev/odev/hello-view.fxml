@@ -1,65 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Rectangle?>
 
-<AnchorPane prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TrafficViewController">
-    <!-- Kavşak Alanı -->
-    <Pane fx:id="drawPane" prefHeight="800.0" prefWidth="800.0">
-        <!-- YOLLAR -->
-        <Rectangle fill="LIGHTGRAY" height="800.0" layoutX="370.0" layoutY="0.0" width="20.0" />
-        <Rectangle fill="LIGHTGRAY" height="800.0" layoutX="410.0" layoutY="0.0" width="20.0" />
-        <Rectangle fill="LIGHTGRAY" height="20.0" layoutX="0.0" layoutY="370.0" width="800.0" />
-        <Rectangle fill="LIGHTGRAY" height="20.0" layoutX="0.0" layoutY="410.0" width="800.0" />
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="controller.TrafficController">
 
-        <!-- KAVŞAK -->
-        <Rectangle fill="DARKGRAY" height="60.0" layoutX="370.0" layoutY="370.0" width="60.0" />
+    <!-- Kavşak Merkezi -->
+    <Pane fx:id="intersectionPane" layoutX="771.0" layoutY="290.0" prefHeight="346.0" prefWidth="364.0" style="-fx-background-color: lightgray; -fx-border-color: black;" AnchorPane.bottomAnchor="50.0">
+        <!-- Dikey Yol -->
+        <Rectangle fill="gray" height="349.0" width="50" x="175" y="0" />
+        <!-- Yatay Yol -->
+        <Rectangle fill="gray" height="50" layoutX="15.0" layoutY="-4.0" width="400" x="0" y="175" />
 
-        <!-- TRAFİK IŞIKLARI (KÖŞELER) -->
-        <Group layoutX="350.0" layoutY="300.0">
-            <Rectangle fill="BLACK" height="45.0" width="15.0" />
-            <Circle fill="RED" layoutX="7.5" layoutY="7.5" radius="5.0" />
-            <Circle fill="GOLDENROD" layoutX="7.5" layoutY="22.5" radius="5.0" />
-            <Circle fill="DARKGREEN" layoutX="7.5" layoutY="37.5" radius="5.0" />
-        </Group>
-        <Group layoutX="430.0" layoutY="300.0">
-            <Rectangle fill="BLACK" height="45.0" width="15.0" />
-            <Circle fill="RED" layoutX="7.5" layoutY="7.5" radius="5.0" />
-            <Circle fill="GOLDENROD" layoutX="7.5" layoutY="22.5" radius="5.0" />
-            <Circle fill="DARKGREEN" layoutX="7.5" layoutY="37.5" radius="5.0" />
-        </Group>
-        <Group layoutX="350.0" layoutY="460.0">
-            <Rectangle fill="BLACK" height="45.0" width="15.0" />
-            <Circle fill="RED" layoutX="7.5" layoutY="7.5" radius="5.0" />
-            <Circle fill="GOLDENROD" layoutX="7.5" layoutY="22.5" radius="5.0" />
-            <Circle fill="DARKGREEN" layoutX="7.5" layoutY="37.5" radius="5.0" />
-        </Group>
-        <Group layoutX="430.0" layoutY="460.0">
-            <Rectangle fill="BLACK" height="45.0" width="15.0" />
-            <Circle fill="RED" layoutX="7.5" layoutY="7.5" radius="5.0" />
-            <Circle fill="GOLDENROD" layoutX="7.5" layoutY="22.5" radius="5.0" />
-            <Circle fill="DARKGREEN" layoutX="7.5" layoutY="37.5" radius="5.0" />
-        </Group>
+        <!-- Trafik Işıkları -->
+        <Circle fx:id="lightNorth" fill="red" layoutX="200" layoutY="20" radius="10" />
+        <Circle fx:id="lightEast" fill="red" layoutX="380" layoutY="200" radius="10" />
+        <Circle fx:id="lightWest" fill="red" layoutX="20" layoutY="200" radius="10" />
+        <Circle fx:id="lightSouth" fill="red" layoutX="196.0" layoutY="316.0" radius="10" />
     </Pane>
 
-    <!-- KONTROL PANELİ -->
-    <VBox alignment="TOP_LEFT" layoutX="600.0" layoutY="50.0" prefHeight="401.0" prefWidth="162.0" spacing="10.0">
-        <Label text="Araç Sayısı" />
-        <Label text="North" />
-        <TextField fx:id="northField" text="0" />
-        <Label text="South" />
-        <TextField fx:id="southField" text="0" />
-        <Label text="East" />
-        <TextField fx:id="eastField" text="0" />
-        <Label text="West" />
-        <TextField fx:id="westField" text="0" />
-        <Button fx:id="randomButton" text="Rastgele Oluştur" />
-        <Button fx:id="calculateButton" text="Işık Sürelerini Hesapla" />
-        <Label text="Yeşil Işık Süreleri" />
-        <Label fx:id="northTime" text="North: 0 sn" />
-        <Label fx:id="southTime" text="South: 0 sn" />
-        <Label fx:id="eastTime" text="East: 0 sn" />
-        <Label fx:id="westTime" text="West: 0 sn" />
+    <!-- Araç Girişi -->
+    <VBox layoutX="100" layoutY="150" spacing="10">
+        <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Araç Yoğunluğu Girişi" />
+        <HBox spacing="10">
+            <Label text="North:" />
+            <TextField fx:id="inputNorth" prefWidth="60" />
+        </HBox>
+        <HBox spacing="10">
+            <Label text="South:" />
+            <TextField fx:id="inputSouth" prefWidth="60" />
+        </HBox>
+        <HBox spacing="10">
+            <Label text="East:" />
+            <TextField fx:id="inputEast" prefWidth="60" />
+        </HBox>
+        <HBox spacing="10">
+            <Label text="West:" />
+            <TextField fx:id="inputWest" prefWidth="60" />
+        </HBox>
+        <Button fx:id="btnRandom" prefWidth="150" text="Rastgele Ata" />
     </VBox>
+
+    <!-- Kontrol Düğmeleri -->
+    <HBox layoutX="100" layoutY="420" spacing="15">
+        <Button fx:id="btnStart" prefWidth="100" text="Başlat" />
+        <Button fx:id="btnPause" prefWidth="100" text="Durdur" />
+        <Button fx:id="btnReset" prefWidth="100" text="Sıfırla" />
+    </HBox>
+
+    <!-- Zamanlayıcı Etiketleri -->
+    <VBox layoutX="1520" layoutY="150" spacing="15">
+        <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Kalan Süreler" />
+        <Label fx:id="timerNorth" text="North: 0s" />
+        <Label fx:id="timerSouth" text="South: 0s" />
+        <Label fx:id="timerEast" text="East: 0s" />
+        <Label fx:id="timerWest" text="West: 0s" />
+    </VBox>
+
 </AnchorPane>

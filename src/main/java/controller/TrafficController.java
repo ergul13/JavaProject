@@ -1,23 +1,19 @@
 package controller;
 
-import model.*;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.shape.Circle;
 
 public class TrafficController {
-    private VehicleManager manager;
 
-    public TrafficController(VehicleManager manager) {
-        this.manager = manager;
+    @FXML private TextField inputNorth, inputSouth, inputEast, inputWest;
+    @FXML private Label timerNorth, timerSouth, timerEast, timerWest;
+    @FXML private Circle lightNorth, lightSouth, lightEast, lightWest;
+    @FXML private Button btnRandom, btnStart, btnPause, btnReset;
+
+    public void initialize() {
+        // Başlangıç işlemleri
     }
 
-    public void setVehicleDensity(Direction direction, int count) {
-        manager.setVehicleCount(direction, count);
-    }
-
-    public void updateSignalTimings() {
-        manager.calculateGreenTimes();
-    }
-
-    public VehicleManager getManager() {
-        return manager;
-    }
+    // Buton eventleri vs. buraya gelecek
 }
