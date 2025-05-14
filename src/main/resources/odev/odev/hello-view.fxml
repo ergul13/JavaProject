@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
@@ -7,27 +9,57 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="controller.TrafficController">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TrafficController">
 
     <!-- Kavşak Merkezi -->
-    <Pane fx:id="intersectionPane" layoutX="771.0" layoutY="290.0" prefHeight="346.0" prefWidth="364.0" style="-fx-background-color: lightgray; -fx-border-color: black;" AnchorPane.bottomAnchor="50.0">
+    <Pane fx:id="intersectionPane" layoutX="501.0" layoutY="79.0" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: lightgray; -fx-border-color: black;" AnchorPane.bottomAnchor="141.0">
         <!-- Dikey Yol -->
-        <Rectangle fill="gray" height="349.0" width="50" x="175" y="0" />
+        <Rectangle fill="gray" height="500.0" layoutX="35.0" width="80.0" x="175" y="0" />
         <!-- Yatay Yol -->
-        <Rectangle fill="gray" height="50" layoutX="15.0" layoutY="-4.0" width="400" x="0" y="175" />
-
-        <!-- Trafik Işıkları -->
-        <Circle fx:id="lightNorth" fill="red" layoutX="200" layoutY="20" radius="10" />
-        <Circle fx:id="lightEast" fill="red" layoutX="380" layoutY="200" radius="10" />
-        <Circle fx:id="lightWest" fill="red" layoutX="20" layoutY="200" radius="10" />
-        <Circle fx:id="lightSouth" fill="red" layoutX="196.0" layoutY="316.0" radius="10" />
+        <Rectangle fill="gray" height="80.0" layoutY="35.0" width="500.0" x="0" y="175" />
+      <Group layoutX="10.0" layoutY="248.0">
+         <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+         </children>
+      </Group>
+      <Group layoutX="302.0" layoutY="248.0">
+         <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+         </children>
+      </Group>
+      <Group layoutX="155.0" layoutY="390.0" rotate="90.0">
+         <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+         </children>
+      </Group>
+      <Group layoutX="155.0" layoutY="105.0" rotate="90.0">
+         <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+         </children>
+      </Group>
     </Pane>
 
     <!-- Araç Girişi -->
-    <VBox layoutX="100" layoutY="150" spacing="10">
+    <VBox layoutX="133.0" layoutY="106.0" prefHeight="226.0" prefWidth="201.0" spacing="10">
         <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Araç Yoğunluğu Girişi" />
         <HBox spacing="10">
             <Label text="North:" />
@@ -35,33 +67,64 @@
         </HBox>
         <HBox spacing="10">
             <Label text="South:" />
-            <TextField fx:id="inputSouth" prefWidth="60" />
+         <TextField fx:id="inputNorth1" prefWidth="60" />
         </HBox>
         <HBox spacing="10">
             <Label text="East:" />
-            <TextField fx:id="inputEast" prefWidth="60" />
+         <TextField fx:id="inputNorth11" prefWidth="60">
+            <HBox.margin>
+               <Insets left="10.0" />
+            </HBox.margin>
+         </TextField>
         </HBox>
         <HBox spacing="10">
             <Label text="West:" />
-            <TextField fx:id="inputWest" prefWidth="60" />
+         <TextField fx:id="inputNorth12" prefWidth="60">
+            <HBox.margin>
+               <Insets left="5.0" />
+            </HBox.margin>
+         </TextField>
         </HBox>
-        <Button fx:id="btnRandom" prefWidth="150" text="Rastgele Ata" />
+        <Button fx:id="btnRandom" prefWidth="150" text="Araç Sayısı Ata" />
+      <Label text="*Araç sayısı girilmediğinde rastgele oluşturulacaktır!">
+         <font>
+            <Font size="8.0" />
+         </font>
+      </Label>
     </VBox>
 
     <!-- Kontrol Düğmeleri -->
-    <HBox layoutX="100" layoutY="420" spacing="15">
+    <HBox layoutX="586.0" layoutY="599.0" spacing="15">
         <Button fx:id="btnStart" prefWidth="100" text="Başlat" />
         <Button fx:id="btnPause" prefWidth="100" text="Durdur" />
         <Button fx:id="btnReset" prefWidth="100" text="Sıfırla" />
     </HBox>
 
     <!-- Zamanlayıcı Etiketleri -->
-    <VBox layoutX="1520" layoutY="150" spacing="15">
-        <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Kalan Süreler" />
+    <VBox layoutX="132.0" layoutY="357.0" spacing="15">
+        <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Hesaplanan Süreler:" />
         <Label fx:id="timerNorth" text="North: 0s" />
         <Label fx:id="timerSouth" text="South: 0s" />
         <Label fx:id="timerEast" text="East: 0s" />
         <Label fx:id="timerWest" text="West: 0s" />
     </VBox>
+   <VBox layoutX="335.0" layoutY="357.0" spacing="15">
+      <children>
+         <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Kalan Süreler:" />
+         <Label fx:id="timerNorth1" text="North: 0s" />
+         <Label fx:id="timerSouth1" text="South: 0s" />
+         <Label fx:id="timerEast1" text="East: 0s" />
+         <Label fx:id="timerWest1" text="West: 0s" />
+      </children>
+   </VBox>
+   <VBox layoutX="314.0" layoutY="106.0" spacing="15">
+      <children>
+         <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Yollardaki Araç Sayıları:" />
+         <Label fx:id="timerNorth2" text="North: 0" />
+         <Label fx:id="timerSouth2" text="South: 0" />
+         <Label fx:id="timerEast2" text="East: 0" />
+         <Label fx:id="timerWest2" text="West: 0" />
+      </children>
+   </VBox>
 
 </AnchorPane>
