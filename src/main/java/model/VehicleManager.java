@@ -10,6 +10,7 @@ import java.util.*;
 
 public class VehicleManager {
 
+
     private final Map<Direction, Queue<Rectangle>> queues = new EnumMap<>(Direction.class);
     private final Pane simulationPane1;
 
@@ -25,6 +26,8 @@ public class VehicleManager {
         queues.get(dir).add(car);
     }
 
+
+
     // Her yeşil ışıkta çağrılır
     public void moveVehiclesWest() {
         Queue<Rectangle> queue = queues.get(Direction.WEST);
@@ -33,31 +36,39 @@ public class VehicleManager {
         List<Rectangle> cars = new ArrayList<>(queue);
         Rectangle firstCar = cars.get(0);
 
-        double yPosition = 222; // carW1 Y
-        double spacing = 30;
-        double startX = 165; // carW1 X
+        // İlk aracı dışarı taşı ve sahneden kaldır
+        moveOutOfPaneAndRemove(firstCar, Direction.WEST);
 
-        // 1. İlk arabayı geçir (karşıya)
-        TranslateTransition moveFirst = new TranslateTransition(Duration.seconds(1), firstCar);
-        moveFirst.setByX(200); // karşıya geçiş
-        moveFirst.setOnFinished(e -> simulationPane1.getChildren().remove(firstCar));
-        moveFirst.play();
-
-        // 2. Kuyruktan çıkar
+        // Kuyruktan çıkar
         queue.poll();
 
-        // 3. Diğerlerini 1 adım öne kaydır
+        double spacing = 30;
+
+        // Diğer arabaları hareket ettir
         for (int i = 1; i < cars.size(); i++) {
             Rectangle car = cars.get(i);
-            TranslateTransition move = new TranslateTransition(Duration.seconds(0.3), car);
-            move.setByX(spacing);
-            move.play();
+
+            double newLayoutX = car.getLayoutX() + spacing;
+
+            // Animate: önce TranslateTransition ile hareket ettir
+            TranslateTransition tt = new TranslateTransition(Duration.seconds(0.3), car);
+            tt.setByX(spacing);
+            tt.setOnFinished(e -> {
+                // Animasyon bittiğinde Translate sıfırla, LayoutX'i güncelle
+                car.setTranslateX(0);
+                car.setLayoutX(newLayoutX);
+            });
+            tt.play();
         }
 
-        // 4. Yeni araba oluştur, en arkaya koy (carW1 baz alınarak)
+        // Yeni araba ekle
         Rectangle newCar = new Rectangle(25, 16, Color.web("#fcfeff"));
-        newCar.setLayoutX(165.0 - queue.size() * 30); // spacing
-        newCar.setLayoutY(12); // 222 - 210 = 12 → tam hizaya gelir
+        newCar.setLayoutX(165.0 - queue.size() * spacing);
+
+        double sceneY = firstCar.localToScene(firstCar.getBoundsInLocal()).getMinY();
+        double localY = simulationPane1.sceneToLocal(0, sceneY).getY();
+        newCar.setLayoutY(localY);
+
         newCar.setStroke(Color.BLACK);
         newCar.setArcWidth(5);
         newCar.setArcHeight(5);
@@ -65,11 +76,9 @@ public class VehicleManager {
         newCar.setTranslateY(0);
         simulationPane1.getChildren().add(newCar);
         queue.add(newCar);
-
-
-        simulationPane1.getChildren().add(newCar);
-        queue.add(newCar);
     }
+
+
 
 
     private Rectangle cloneCarLike(Rectangle reference) {
@@ -127,23 +136,14 @@ public class VehicleManager {
         move.play();
     }
     public void moveOutOfPaneAndRemove(Rectangle car, Direction dir) {
-        double targetX = car.getLayoutX();
-        double targetY = car.getLayoutY();
         double moveAmount = 0;
 
         switch (dir) {
             case WEST -> {
-                moveAmount = simulationPane1.getWidth() - (car.getLayoutX() + car.getWidth());
+                double currentX = car.getLayoutX() + car.getTranslateX() + car.getWidth();
+                moveAmount = simulationPane1.getWidth() - currentX + 50; // biraz fazlası
             }
-            case EAST -> {
-                moveAmount = -car.getLayoutX() - car.getWidth(); // sola
-            }
-            case NORTH -> {
-                moveAmount = -car.getLayoutY() - car.getHeight(); // yukarı
-            }
-            case SOUTH -> {
-                moveAmount = simulationPane1.getHeight() - (car.getLayoutY() + car.getHeight());
-            }
+            // Diğer yönlerde de benzer şekilde
         }
 
         TranslateTransition move = new TranslateTransition(Duration.seconds(2), car);
@@ -154,11 +154,16 @@ public class VehicleManager {
         }
 
         move.setOnFinished(e -> {
+            car.setTranslateX(0);
+            car.setTranslateY(0);
             simulationPane1.getChildren().remove(car);
+            System.out.println("Araba silindi: " + car);
         });
 
         move.play();
     }
+
+
 
 
 }

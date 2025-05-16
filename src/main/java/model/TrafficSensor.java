@@ -14,7 +14,7 @@ public class TrafficSensor {
 
     // Sensör bu metotla veri gönderir
     public int detectVehicles() {
-        return random.nextInt(3); // 0, 1, ya da 2
+        return random.nextInt(2); // 0, 1, ya da 2
     }
 
     public Direction getDirection() {

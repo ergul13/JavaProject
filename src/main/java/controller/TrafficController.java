@@ -52,6 +52,8 @@ public class TrafficController implements Initializable {
     private final int TOTAL_CYCLE_TIME = 120;
 
 
+
+
     // Her yön için bir TrafficLamp nesnesi
     private final Map<Direction, TrafficLamp> lamps = new EnumMap<>(Direction.class);
 
@@ -77,7 +79,9 @@ public class TrafficController implements Initializable {
         vehicleManager.addInitialVehicle(Direction.WEST, carW5);
         vehicleManager.addInitialVehicle(Direction.WEST, carW6);
 
+
     }
+
 
     // Aktif ışığı yak, diğerlerini kırmızı yap
     public void setActiveLight(Direction active, String color) {
