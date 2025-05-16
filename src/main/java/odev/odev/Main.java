@@ -25,7 +25,7 @@ public class Main extends Application {
 
         // Göster
         stage.show();
-        //Fatih
+        //Fatih,
     }
 
     public static void main(String[] args) {
