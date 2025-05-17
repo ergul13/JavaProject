@@ -48,7 +48,7 @@ public class TrafficController implements Initializable {
 
 
 
-    // FXML'deki Circle'lar
+    // FXML'deki Circle'la
     @FXML private Circle northRed, northYellow, northGreen;
     @FXML private Circle southRed, southYellow, southGreen;
     @FXML private Circle eastRed, eastYellow, eastGreen;
@@ -161,9 +161,15 @@ public class TrafficController implements Initializable {
             currentLight.tick();
             updateRemainingTimeLabel(currentDirection, currentLight.getRemainingTime());
 
-            if (currentDirection == Direction.WEST && currentLight.getState() == TrafficLight.LightState.GREEN) {
-                vehicleManager.moveVehiclesWest();
+            if (currentLight.getState() == TrafficLight.LightState.GREEN) {
+                switch (currentDirection) {
+                    case NORTH -> vehicleManager.moveVehiclesNorth();
+                    case EAST  -> vehicleManager.moveVehiclesEast();
+                    case SOUTH -> vehicleManager.moveVehiclesSouth();
+                    case WEST  -> vehicleManager.moveVehiclesWest();
+                }
             }
+
 
 
             if (currentLight.getRemainingTime() <= 0) {

@@ -70,6 +70,87 @@ public class VehicleManager {
         simulationPane1.getChildren().add(newCar);
         queue.add(newCar);
     }
+    public void moveVehiclesEast() {
+        Queue<Rectangle> queue = queues.get(Direction.EAST);
+        if (queue.isEmpty()) return;
+
+        List<Rectangle> cars = new ArrayList<>(queue);
+        Rectangle firstCar = cars.get(0);
+
+        TranslateTransition moveFirst = new TranslateTransition(Duration.seconds(1), firstCar);
+        moveFirst.setByX(-200); // EAST → sola
+        moveFirst.setOnFinished(e -> simulationPane1.getChildren().remove(firstCar));
+        moveFirst.play();
+
+        queue.poll();
+
+        for (int i = 1; i < cars.size(); i++) {
+            TranslateTransition move = new TranslateTransition(Duration.seconds(0.3), cars.get(i));
+            move.setByX(-30); // geri kalanlar sola kayar
+            move.play();
+        }
+
+        Rectangle newCar = cloneCarLike(firstCar);
+        newCar.setLayoutX(firstCar.getLayoutX() + queue.size() * 30);
+        newCar.setLayoutY(firstCar.getLayoutY());
+        simulationPane1.getChildren().add(newCar);
+        queue.add(newCar);
+    }
+
+    public void moveVehiclesNorth() {
+        Queue<Rectangle> queue = queues.get(Direction.NORTH);
+        if (queue.isEmpty()) return;
+
+        List<Rectangle> cars = new ArrayList<>(queue);
+        Rectangle firstCar = cars.get(0);
+
+        TranslateTransition moveFirst = new TranslateTransition(Duration.seconds(1), firstCar);
+        moveFirst.setByY(200); // NORTH → aşağı
+        moveFirst.setOnFinished(e -> simulationPane1.getChildren().remove(firstCar));
+        moveFirst.play();
+
+        queue.poll();
+
+        for (int i = 1; i < cars.size(); i++) {
+            TranslateTransition move = new TranslateTransition(Duration.seconds(0.3), cars.get(i));
+            move.setByY(30); // aşağı kay
+            move.play();
+        }
+
+        Rectangle newCar = cloneCarLike(firstCar);
+        newCar.setLayoutX(firstCar.getLayoutX());
+        newCar.setLayoutY(firstCar.getLayoutY() - (queue.size() * 30));
+        simulationPane1.getChildren().add(newCar);
+        queue.add(newCar);
+    }
+
+    public void moveVehiclesSouth() {
+        Queue<Rectangle> queue = queues.get(Direction.SOUTH);
+        if (queue.isEmpty()) return;
+
+        List<Rectangle> cars = new ArrayList<>(queue);
+        Rectangle firstCar = cars.get(0);
+
+        TranslateTransition moveFirst = new TranslateTransition(Duration.seconds(1), firstCar);
+        moveFirst.setByY(-200); // SOUTH → yukarı
+        moveFirst.setOnFinished(e -> simulationPane1.getChildren().remove(firstCar));
+        moveFirst.play();
+
+        queue.poll();
+
+        for (int i = 1; i < cars.size(); i++) {
+            TranslateTransition move = new TranslateTransition(Duration.seconds(0.3), cars.get(i));
+            move.setByY(-30);
+            move.play();
+        }
+
+        Rectangle newCar = cloneCarLike(firstCar);
+        newCar.setLayoutX(firstCar.getLayoutX());
+        newCar.setLayoutY(firstCar.getLayoutY() + (queue.size() * 30));
+        simulationPane1.getChildren().add(newCar);
+        queue.add(newCar);
+    }
+
 
 
     private Rectangle cloneCarLike(Rectangle reference) {
