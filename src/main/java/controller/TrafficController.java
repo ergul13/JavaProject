@@ -6,7 +6,8 @@ import javafx.scene.shape.Circle;
 import model.Direction;
 import model.TrafficLamp;
 import model.VehicleManager;
-
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.EnumMap;
@@ -37,15 +38,28 @@ import javafx.scene.layout.Pane;
 
 
 
+
 public class TrafficController implements Initializable {
 
+    private int northDur, southDur, eastDur, westDur;
+    private final String[] lightOrder = {"NORTH","SOUTH","EAST", "WEST"};
+    private int currentPhase = 0;
+    private Timeline mainTimeline;
 
 
-    // FXML'deki Circle'lar
+
+    // FXML'deki Circle'la
     @FXML private Circle northRed, northYellow, northGreen;
     @FXML private Circle southRed, southYellow, southGreen;
     @FXML private Circle eastRed, eastYellow, eastGreen;
     @FXML private Circle westRed, westYellow, westGreen;
+    @FXML private Rectangle carN1,carN2,carN3,carN4,carN5,carN6;
+    @FXML private Rectangle carS1,carS2,carS3,carS4,carS5,carS6;
+    @FXML private Rectangle carE1,carE2,carE3,carE4,carE5,carE6;
+    @FXML private Rectangle carW1,carW2,carW3,carW4,carW5,carW6;
+
+
+
     private Set<Direction> servedDirections = new HashSet<>();
     private int elapsedTime = 0;
     private final int YELLOW_TIME = 3;
@@ -78,6 +92,7 @@ public class TrafficController implements Initializable {
         vehicleManager.addInitialVehicle(Direction.WEST, carW6);
 
     }
+
 
     // Aktif ışığı yak, diğerlerini kırmızı yap
     public void setActiveLight(Direction active, String color) {
@@ -146,9 +161,15 @@ public class TrafficController implements Initializable {
             currentLight.tick();
             updateRemainingTimeLabel(currentDirection, currentLight.getRemainingTime());
 
-            if (currentDirection == Direction.WEST && currentLight.getState() == TrafficLight.LightState.GREEN) {
-                vehicleManager.moveVehiclesWest();
+            if (currentLight.getState() == TrafficLight.LightState.GREEN) {
+                switch (currentDirection) {
+                    case NORTH -> vehicleManager.moveVehiclesNorth();
+                    case EAST  -> vehicleManager.moveVehiclesEast();
+                    case SOUTH -> vehicleManager.moveVehiclesSouth();
+                    case WEST  -> vehicleManager.moveVehiclesWest();
+                }
             }
+
 
 
             if (currentLight.getRemainingTime() <= 0) {
@@ -258,6 +279,14 @@ public class TrafficController implements Initializable {
         calculator = null;
         lights = null;
     }
+    private void resetLights() {
+        northRed.setOpacity(0.3); northYellow.setOpacity(0.3); northGreen.setOpacity(0.3);
+        southRed.setOpacity(0.3); southYellow.setOpacity(0.3); southGreen.setOpacity(0.3);
+        eastRed.setOpacity(0.3); eastYellow.setOpacity(0.3); eastGreen.setOpacity(0.3);
+        westRed.setOpacity(0.3); westYellow.setOpacity(0.3); westGreen.setOpacity(0.3);
+    }
+
+
     private Integer parseInput(String text) {
         try {
             int value = Integer.parseInt(text.trim());
@@ -269,8 +298,40 @@ public class TrafficController implements Initializable {
 
     @FXML private javafx.scene.control.TextField inputNorth, inputSouth, inputEast, inputWest;
 
+    public void moveCarNorth(Rectangle car, int delaySeconds) {
+        TranslateTransition t = new TranslateTransition(Duration.seconds(2), car);
+        t.setByY(300);
+        t.setDelay(Duration.seconds(delaySeconds));
+        t.play();
+    }
+
+    public void moveCarSouth(Rectangle car, int delaySeconds) {
+        TranslateTransition t = new TranslateTransition(Duration.seconds(2), car);
+        t.setByY(-300);
+        t.setDelay(Duration.seconds(delaySeconds));
+        t.play();
+    }
+
+    public void moveCarEast(Rectangle car, int delaySeconds) {
+        TranslateTransition t = new TranslateTransition(Duration.seconds(2), car);
+        t.setByX(-300);
+        t.setDelay(Duration.seconds(delaySeconds));
+        t.play();
+    }
+
+    public void moveCarWest(Rectangle car, int delaySeconds) {
+        TranslateTransition t = new TranslateTransition(Duration.seconds(2), car);
+        t.setByX(300);
+        t.setDelay(Duration.seconds(delaySeconds));
+        t.play();
+    }
+
+
     @FXML
     public void startSimulation() {
+
+        startLightCycle();
+
         calculator = new TrafficCalculator();
 
         Integer n = parseInput(inputNorth.getText());
@@ -294,7 +355,72 @@ public class TrafficController implements Initializable {
 
         startTimeline();
     }
-    @FXML private Rectangle carW1, carW2, carW3, carW4, carW5, carW6;
+
+    private void startLightCycle() {
+        currentPhase = 0;
+        runNextPhase(); // İlk fazı başlat
+    }
+    private void runNextPhase() {
+        resetLights();
+        String currentDirection = lightOrder[currentPhase];
+        int duration;
+
+        switch (currentDirection) {
+            case "NORTH" -> {
+                northGreen.setOpacity(1);
+                duration = northDur;
+
+                moveCarNorth(carN1,0);
+                moveCarNorth(carN2,1);
+                moveCarNorth(carN3,2);
+                moveCarNorth(carN4,3);
+                moveCarNorth(carN5,4);
+                moveCarNorth(carN6,5);
+            }
+            case "EAST" -> {
+                eastGreen.setOpacity(1);
+                duration = eastDur;
+
+                moveCarEast(carE1,0);
+                moveCarEast(carE2,1);
+                moveCarEast(carE3,2);
+                moveCarEast(carE4,3);
+                moveCarEast(carE5,4);
+                moveCarEast(carE6,5);
+
+            }
+            case "SOUTH" -> {
+                southGreen.setOpacity(1);
+                duration = southDur;
+
+                moveCarSouth(carS1,0);
+                moveCarSouth(carS2,1);
+                moveCarSouth(carS3,2);
+                moveCarSouth(carS4,3);
+                moveCarSouth(carS5,4);
+                moveCarSouth(carS6,5);
+            }
+            case "WEST" -> {
+                westGreen.setOpacity(1);
+                duration = westDur;
+
+                moveCarWest(carW1,0);
+                moveCarWest(carW2,1);
+                moveCarWest(carW3,2);
+                moveCarWest(carW4,3);
+                moveCarWest(carW5,4);
+                moveCarWest(carW6,5);
+            }
+            default -> duration = 10;
+        }
+
+        mainTimeline = new Timeline(new KeyFrame(Duration.seconds(duration), e -> {
+            currentPhase = (currentPhase + 1) % lightOrder.length;
+            runNextPhase();
+        }));
+        mainTimeline.play();
+    }
+
     @FXML private Pane simulationPane1;
 
     private VehicleManager vehicleManager;
