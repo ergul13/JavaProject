@@ -45,6 +45,7 @@ public class TrafficController implements Initializable {
     private final String[] lightOrder = {"NORTH","SOUTH","EAST", "WEST"};
     private int currentPhase = 0;
     private Timeline mainTimeline;
+    //yokbişey
 
 
     // FXML'deki Circle'lar
