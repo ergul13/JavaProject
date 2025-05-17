@@ -6,203 +6,200 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-<!--yokbişey-->
+
 <AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.TrafficController">
 
-    <!-- Kavşak Merkezi -->
-    <Pane fx:id="intersectionPane" layoutX="501.0" layoutY="82.0" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: lightgray; -fx-border-color: black;" AnchorPane.bottomAnchor="138.0">
-        <!-- Dikey Yol -->
-        <Rectangle fill="gray" height="500.0" layoutX="35.0" width="80.0" x="175" y="0" />
-        <!-- Yatay Yol -->
-        <Rectangle fill="gray" height="80.0" layoutY="35.0" width="500.0" x="0" y="175" />
-        <Group layoutX="10.0" layoutY="248.0">
-            <children>
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-            </children>
-        </Group>
-        <Group layoutX="302.0" layoutY="248.0">
-            <children>
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-            </children>
-        </Group>
-        <Group layoutX="155.0" layoutY="390.0" rotate="90.0">
-            <children>
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-            </children>
-        </Group>
-        <Group layoutX="155.0" layoutY="105.0" rotate="90.0">
-            <children>
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-                <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-            </children>
-        </Group>
-        <Group layoutX="280.0" layoutY="320.0" rotate="-90.0">
-            <children>
-                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="30.0" stroke="BLACK" strokeType="INSIDE" width="70.0" />
-                <Circle fx:id="southRed" fill="RED" layoutX="55.0" layoutY="15.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-                <Circle fx:id="southYellow" fill="YELLOW" layoutX="33.0" layoutY="15.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-                <Circle fx:id="southGreen" fill="LIME" layoutX="12.0" layoutY="15.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            </children>
-        </Group>
-        <Group layoutX="152.0" layoutY="153.0" rotate="-180.0" />
-        <Group layoutX="130.0" layoutY="320.0" rotate="90.0" />
-        <Group layoutX="300.0" layoutY="133.0">
-            <children>
-                <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="30.0" layoutY="36.0" stroke="BLACK" strokeType="INSIDE" width="72.0" />
-                <Circle fx:id="eastRed" fill="RED" layoutX="14.0" layoutY="51.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-                <Circle fx:id="eastYellow" fill="YELLOW" layoutX="36.0" layoutY="51.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-                <Circle fx:id="eastGreen" fill="LIME" layoutX="58.0" layoutY="51.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-            </children>
-        </Group>
-        <Text layoutX="30.0" layoutY="195.0" strokeType="OUTSIDE" strokeWidth="0.0" text="West">
-            <font>
-                <Font name="System Bold" size="13.0" />
-            </font>
-        </Text>
-        <Text layoutX="445.0" layoutY="195.0" strokeType="OUTSIDE" strokeWidth="0.0" text="East">
-            <font>
-                <Font name="System Bold" size="13.0" />
-            </font>
-        </Text>
-        <Text layoutX="302.0" layoutY="481.0" strokeType="OUTSIDE" strokeWidth="0.0" text="South">
-            <font>
-                <Font name="System Bold" size="13.0" />
-            </font>
-        </Text>
-        <Text layoutX="302.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="North">
-            <font>
-                <Font name="System Bold" size="13.0" />
-            </font>
-        </Text>
-        <Rectangle fx:id="carW6" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="135.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carW5" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="165.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carW4" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="105.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carW3" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="75.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carW2" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="45.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carW1" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="15.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+<!-- Kavşak Merkezi -->
+<Pane fx:id="intersectionPane" layoutX="501.0" layoutY="82.0" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: lightgray; -fx-border-color: black;" AnchorPane.bottomAnchor="138.0">
+    <!-- Dikey Yol -->
+    <Rectangle fill="gray" height="500.0" layoutX="35.0" width="80.0" x="175" y="0" />
+    <!-- Yatay Yol -->
+    <Rectangle fill="gray" height="80.0" layoutY="35.0" width="500.0" x="0" y="175" />
+    <Group layoutX="10.0" layoutY="248.0">
+        <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+        </children>
+    </Group>
+    <Group layoutX="302.0" layoutY="248.0">
+        <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+        </children>
+    </Group>
+    <Group layoutX="155.0" layoutY="390.0" rotate="90.0">
+        <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+        </children>
+    </Group>
+    <Group layoutX="155.0" layoutY="105.0" rotate="90.0">
+        <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="40.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="80.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="120.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+            <Rectangle arcHeight="5.0" arcWidth="5.0" height="5.0" layoutX="160.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+        </children>
+    </Group>
+    <Group layoutX="280.0" layoutY="320.0" rotate="-90.0">
+        <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="30.0" stroke="BLACK" strokeType="INSIDE" width="70.0" />
+            <Circle fx:id="southRed" fill="RED" layoutX="55.0" layoutY="15.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="southYellow" fill="YELLOW" layoutX="33.0" layoutY="15.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="southGreen" fill="LIME" layoutX="12.0" layoutY="15.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+        </children>
+    </Group>
+    <Group layoutX="152.0" layoutY="153.0" rotate="-180.0" />
+    <Group layoutX="130.0" layoutY="320.0" rotate="90.0" />
+    <Group layoutX="300.0" layoutY="133.0">
+        <children>
+            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="30.0" layoutY="36.0" stroke="BLACK" strokeType="INSIDE" width="72.0" />
+            <Circle fx:id="eastRed" fill="RED" layoutX="14.0" layoutY="51.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="eastYellow" fill="YELLOW" layoutX="36.0" layoutY="51.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+            <Circle fx:id="eastGreen" fill="LIME" layoutX="58.0" layoutY="51.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+        </children>
+    </Group>
+    <Text layoutX="30.0" layoutY="195.0" strokeType="OUTSIDE" strokeWidth="0.0" text="West">
+        <font>
+            <Font name="System Bold" size="13.0" />
+        </font>
+    </Text>
+    <Text layoutX="445.0" layoutY="195.0" strokeType="OUTSIDE" strokeWidth="0.0" text="East">
+        <font>
+            <Font name="System Bold" size="13.0" />
+        </font>
+    </Text>
+    <Text layoutX="302.0" layoutY="481.0" strokeType="OUTSIDE" strokeWidth="0.0" text="South">
+        <font>
+            <Font name="System Bold" size="13.0" />
+        </font>
+    </Text>
+    <Text layoutX="302.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="North">
+        <font>
+            <Font name="System Bold" size="13.0" />
+        </font>
+    </Text>
+    <Rectangle fx:id="carW6" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="135.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carW5" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="165.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carW4" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="105.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carW3" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="75.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carW2" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="45.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carW1" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="15.0" layoutY="260.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
 
-        <!-- NORTH araçları -->
-        <Rectangle fx:id="carN6" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="30.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carN5" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carN4" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="90.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carN3" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carN2" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="150.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carN1" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <!-- NORTH araçları -->
+    <Rectangle fx:id="carN6" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="30.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carN5" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="60.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carN4" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="90.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carN3" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="120.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carN2" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="150.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carN1" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="225.0" layoutY="180.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
 
-        <!-- SOUTH araçları -->
-        <Rectangle fx:id="carS6" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="300.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carS5" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="330.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carS4" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="360.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carS3" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="390.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carS2" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="420.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
-        <Rectangle fx:id="carS1" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="450.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <!-- SOUTH araçları -->
+    <Rectangle fx:id="carS6" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="300.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carS5" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="330.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carS4" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="360.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carS3" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="390.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carS2" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="420.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
+    <Rectangle fx:id="carS1" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="25.0" layoutX="260.0" layoutY="450.0" stroke="BLACK" strokeType="INSIDE" width="16.0" />
 
 
-        <!-- EAST araçları -->
-        <Rectangle fx:id="carE6" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="300.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carE5" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="330.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carE4" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="360.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carE3" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="390.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carE2" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="420.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
-        <Rectangle fx:id="carE1" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="450.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <!-- EAST araçları -->
+    <Rectangle fx:id="carE6" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="300.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carE5" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="330.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carE4" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="360.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carE3" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="390.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carE2" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="420.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
+    <Rectangle fx:id="carE1" arcHeight="5.0" arcWidth="5.0" fill="#fcfeff" height="16.0" layoutX="450.0" layoutY="220.0" stroke="BLACK" strokeType="INSIDE" width="25.0" />
 
-        <Pane fx:id="simulationPane1" layoutX="-1.0" layoutY="210.0" prefHeight="80.0" prefWidth="502.0" />
-          <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="30.0" layoutX="129.0" layoutY="298.0" stroke="BLACK" strokeType="INSIDE" width="72.0" />
-          <Circle fx:id="westGreen" fill="LIME" layoutX="143.0" layoutY="313.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-          <Circle fx:id="westYellow" fill="YELLOW" layoutX="165.0" layoutY="313.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-          <Circle fx:id="westRed" fill="RED" layoutX="190.0" layoutY="313.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-          <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="72.0" layoutX="170.0" layoutY="132.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
-          <Circle fx:id="northGreen" fill="LIME" layoutX="185.0" layoutY="145.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-          <Circle fx:id="northYellow" fill="YELLOW" layoutX="185.0" layoutY="169.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-          <Circle fx:id="northRed" fill="RED" layoutX="185.0" layoutY="193.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
-    </Pane>
+    <Pane fx:id="simulationPane1" layoutX="-1.0" layoutY="210.0" prefHeight="80.0" prefWidth="502.0" />
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="30.0" layoutX="129.0" layoutY="298.0" stroke="BLACK" strokeType="INSIDE" width="72.0" />
+    <Circle fx:id="westGreen" fill="LIME" layoutX="143.0" layoutY="313.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+    <Circle fx:id="westYellow" fill="YELLOW" layoutX="165.0" layoutY="313.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+    <Circle fx:id="westRed" fill="RED" layoutX="190.0" layoutY="313.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="72.0" layoutX="170.0" layoutY="132.0" stroke="BLACK" strokeType="INSIDE" width="30.0" />
+    <Circle fx:id="northGreen" fill="LIME" layoutX="185.0" layoutY="145.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+    <Circle fx:id="northYellow" fill="YELLOW" layoutX="185.0" layoutY="169.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+    <Circle fx:id="northRed" fill="RED" layoutX="185.0" layoutY="193.0" opacity="0.5" radius="8.0" stroke="BLACK" strokeType="INSIDE" />
+</Pane>
 
-    <!-- Araç Girişi -->
-    <VBox layoutX="133.0" layoutY="106.0" prefHeight="226.0" prefWidth="201.0" spacing="10">
-        <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Araç Yoğunluğu Girişi" />
-        <HBox spacing="10">
-            <Label text="North:" />
-            <TextField fx:id="inputNorth" prefWidth="60" />
-        </HBox>
-        <HBox spacing="10">
-            <Label text="South:" />
-            <TextField fx:id="inputSouth" prefWidth="60" />
-        </HBox>
-        <HBox spacing="10">
-            <Label text="East:" />
-            <TextField fx:id="inputEast" prefWidth="60">
-                <HBox.margin>
-                    <Insets left="10.0" />
-                </HBox.margin>
-            </TextField>
-        </HBox>
-        <HBox spacing="10">
-            <Label text="West:" />
-            <TextField fx:id="inputWest" prefWidth="60">
-                <HBox.margin>
-                    <Insets left="5.0" />
-                </HBox.margin>
-            </TextField>
-        </HBox>
-        <Button fx:id="btnRandom" prefWidth="150" text="Araç Sayısı Ata" />
-        <Label text="*Araç sayısı girilmediğinde rastgele oluşturulacaktır!">
-            <font>
-                <Font size="8.0" />
-            </font>
-        </Label>
-    </VBox>
-
-    <!-- Kontrol Düğmeleri -->
-    <HBox layoutX="586.0" layoutY="599.0" spacing="15">
-        <Button fx:id="btnStart" onAction="#startSimulation" prefWidth="100" text="Başlat" />
-        <Button fx:id="btnPause" prefWidth="100" text="Durdur" />
-        <Button fx:id="btnReset" onAction="#resetSimulation" prefWidth="100" text="Sıfırla" />
+<!-- Araç Girişi -->
+<VBox layoutX="133.0" layoutY="106.0" prefHeight="226.0" prefWidth="201.0" spacing="10">
+    <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Araç Yoğunluğu Girişi" />
+    <HBox spacing="10">
+        <Label text="North:" />
+        <TextField fx:id="inputNorth" prefWidth="60" />
     </HBox>
+    <HBox spacing="10">
+        <Label text="South:" />
+        <TextField fx:id="inputSouth" prefWidth="60" />
+    </HBox>
+    <HBox spacing="10">
+        <Label text="East:" />
+        <TextField fx:id="inputEast" prefWidth="60">
+            <HBox.margin>
+                <Insets left="10.0" />
+            </HBox.margin>
+        </TextField>
+    </HBox>
+    <HBox spacing="10">
+        <Label text="West:" />
+        <TextField fx:id="inputWest" prefWidth="60">
+            <HBox.margin>
+                <Insets left="5.0" />
+            </HBox.margin>
+        </TextField>
+    </HBox>
+    <Button fx:id="btnRandom" prefWidth="150" text="Araç Sayısı Ata" />
+    <Label text="*Araç sayısı girilmediğinde rastgele oluşturulacaktır!">
+        <font>
+            <Font size="8.0" />
+        </font>
+    </Label>
+</VBox>
 
-    <!-- Zamanlayıcı Etiketleri -->
-    <VBox layoutX="132.0" layoutY="357.0" spacing="15">
-        <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Hesaplanan Süreler:" />
-        <Label fx:id="calcNorthLabel" text="North: 0s" />
-        <Label fx:id="calcSouthLabel" text="South: 0s" />
-        <Label fx:id="calcEastLabel" text="East: 0s" />
-        <Label fx:id="calcWestLabel" text="West: 0s" />
-    </VBox>
-    <VBox layoutX="335.0" layoutY="357.0" spacing="15">
-        <children>
-            <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Kalan Süreler:" />
-            <Label fx:id="remainNorthLabel" text="North: 0s" />
-            <Label fx:id="remainSouthLabel" text="South: 0s" />
-            <Label fx:id="remainEastLabel" text="East: 0s" />
-            <Label fx:id="remainWestLabel" text="West: 0s" />
-        </children>
-    </VBox>
-    <VBox layoutX="314.0" layoutY="106.0" spacing="15">
-        <children>
-            <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Yollardaki Araç Sayıları:" />
-            <Label fx:id="northVehicleCountLabel" text="North: 0" />
-            <Label fx:id="southVehicleCountLabel" text="South: 0" />
-            <Label fx:id="eastVehicleCountLabel" text="East: 0" />
-            <Label fx:id="westVehicleCountLabel" text="West: 0" />
-        </children>
-    </VBox>
+<!-- Kontrol Düğmeleri -->
+<HBox layoutX="586.0" layoutY="599.0" spacing="15">
+    <Button fx:id="btnStart" onAction="#startSimulation" prefWidth="100" text="Başlat" />
+    <Button fx:id="btnPause" prefWidth="100" text="Durdur" />
+    <Button fx:id="btnReset" onAction="#resetSimulation" prefWidth="100" text="Sıfırla" />
+</HBox>
 
-
-
+<!-- Zamanlayıcı Etiketleri -->
+<VBox layoutX="132.0" layoutY="357.0" spacing="15">
+    <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Hesaplanan Süreler:" />
+    <Label fx:id="calcNorthLabel" text="North: 0s" />
+    <Label fx:id="calcSouthLabel" text="South: 0s" />
+    <Label fx:id="calcEastLabel" text="East: 0s" />
+    <Label fx:id="calcWestLabel" text="West: 0s" />
+</VBox>
+<VBox layoutX="335.0" layoutY="357.0" spacing="15">
+    <children>
+        <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Kalan Süreler:" />
+        <Label fx:id="remainNorthLabel" text="North: 0s" />
+        <Label fx:id="remainSouthLabel" text="South: 0s" />
+        <Label fx:id="remainEastLabel" text="East: 0s" />
+        <Label fx:id="remainWestLabel" text="West: 0s" />
+    </children>
+</VBox>
+<VBox layoutX="314.0" layoutY="106.0" spacing="15">
+    <children>
+        <Label style="-fx-font-weight: bold; -fx-font-size: 16" text="Yollardaki Araç Sayıları:" />
+        <Label fx:id="northVehicleCountLabel" text="North: 0" />
+        <Label fx:id="southVehicleCountLabel" text="South: 0" />
+        <Label fx:id="eastVehicleCountLabel" text="East: 0" />
+        <Label fx:id="westVehicleCountLabel" text="West: 0" />
+    </children>
+</VBox>
 
 
 </AnchorPane>
