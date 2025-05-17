@@ -167,7 +167,7 @@
     </Label>
 </VBox>
 
-<!-- Kontrol Düğmeleri -->
+
 <HBox layoutX="586.0" layoutY="599.0" spacing="15">
     <Button fx:id="btnStart" onAction="#startSimulation" prefWidth="100" text="Başlat" />
     <Button fx:id="btnPause" prefWidth="100" text="Durdur" />
