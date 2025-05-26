@@ -1,8 +1,6 @@
 package model;
 
 import javafx.animation.TranslateTransition;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
@@ -10,20 +8,22 @@ import java.util.*;
 
 public class VehicleManager {
 
-    private final Map<Direction, Queue<Rectangle>> queues = new EnumMap<>(Direction.class);
-    private final Pane simulationPane1;
+    private final Map<Direction, Queue<Rectangle>> vehicleQueues = new EnumMap<>(Direction.class);
+    private Rectangle westReference;
 
-    public VehicleManager(Pane simulationPane1) {
-        this.simulationPane1 = simulationPane1;
-        for (Direction dir : Direction.values()) {
-            queues.put(dir, new LinkedList<>());
+    public VehicleManager() {
+        for (Direction d : Direction.values()) {
+            vehicleQueues.put(d, new LinkedList<>());
         }
     }
 
-    // FXML'den araç eklemek için
-    public void addInitialVehicle(Direction dir, Rectangle car) {
-        queues.get(dir).add(car);
+    public void setWestReference(Rectangle ref) {
+        this.westReference = ref;
     }
+
+
+    public void addInitialVehicle(Direction dir, Rectangle vehicle) {
+        vehicleQueues.get(dir).add(vehicle);
 
     // Her yeşil ışıkta çağrılır
     public void moveVehiclesWest() {
@@ -176,70 +176,60 @@ public class VehicleManager {
 
     public void setWestReference(Rectangle reference) {
         this.westReferenceCar = reference;
+
     }
 
-
-
-    public int getVehicleCount(Direction dir) {
-        return queues.get(dir).size();
-    }
-    public void moveVehicleAndRemoveWhenOutside(Rectangle car, Direction dir) {
-        TranslateTransition move = new TranslateTransition(Duration.seconds(1), car);
-
-        switch (dir) {
-            case WEST -> move.setByX(200);
-            case EAST -> move.setByX(-200);
-            case NORTH -> move.setByY(-200);
-            case SOUTH -> move.setByY(200);
+    public void moveVehiclesWest() {
+        Queue<Rectangle> westQueue = vehicleQueues.get(Direction.WEST);
+        int delay = 0;
+        while (!westQueue.isEmpty()) {
+            Rectangle car = westQueue.poll();
+            if (car == null) continue;
+            TranslateTransition t = new TranslateTransition(Duration.seconds(2), car);
+            t.setByX(300);
+            t.setDelay(Duration.seconds(delay));
+            t.play();
+            delay++;
         }
-
-        move.setOnFinished(e -> {
-            double finalX = car.getLayoutX() + car.getTranslateX();
-            double finalY = car.getLayoutY() + car.getTranslateY();
-
-            boolean outX = finalX < 0 || finalX > simulationPane1.getWidth();
-            boolean outY = finalY < 0 || finalY > simulationPane1.getHeight();
-
-            if (outX || outY) {
-                simulationPane1.getChildren().remove(car);
-            }
-        });
-
-        move.play();
-    }
-    public void moveOutOfPaneAndRemove(Rectangle car, Direction dir) {
-        double targetX = car.getLayoutX();
-        double targetY = car.getLayoutY();
-        double moveAmount = 0;
-
-        switch (dir) {
-            case WEST -> {
-                moveAmount = simulationPane1.getWidth() - (car.getLayoutX() + car.getWidth());
-            }
-            case EAST -> {
-                moveAmount = -car.getLayoutX() - car.getWidth(); // sola
-            }
-            case NORTH -> {
-                moveAmount = -car.getLayoutY() - car.getHeight(); // yukarı
-            }
-            case SOUTH -> {
-                moveAmount = simulationPane1.getHeight() - (car.getLayoutY() + car.getHeight());
-            }
-        }
-
-        TranslateTransition move = new TranslateTransition(Duration.seconds(2), car);
-        if (dir == Direction.WEST || dir == Direction.EAST) {
-            move.setByX(moveAmount);
-        } else {
-            move.setByY(moveAmount);
-        }
-
-        move.setOnFinished(e -> {
-            simulationPane1.getChildren().remove(car);
-        });
-
-        move.play();
     }
 
+    public void moveVehiclesNorth() {
+        Queue<Rectangle> q = vehicleQueues.get(Direction.NORTH);
+        int delay = 0;
+        while (!q.isEmpty()) {
+            Rectangle car = q.poll();
+            TranslateTransition t = new TranslateTransition(Duration.seconds(2), car);
+            t.setByY(300);
+            t.setDelay(Duration.seconds(delay));
+            t.play();
+            delay++;
+        }
+    }
+
+    public void moveVehiclesSouth() {
+        Queue<Rectangle> q = vehicleQueues.get(Direction.SOUTH);
+        int delay = 0;
+        while (!q.isEmpty()) {
+            Rectangle car = q.poll();
+            TranslateTransition t = new TranslateTransition(Duration.seconds(2), car);
+            t.setByY(-300);
+            t.setDelay(Duration.seconds(delay));
+            t.play();
+            delay++;
+        }
+    }
+
+    public void moveVehiclesEast() {
+        Queue<Rectangle> q = vehicleQueues.get(Direction.EAST);
+        int delay = 0;
+        while (!q.isEmpty()) {
+            Rectangle car = q.poll();
+            TranslateTransition t = new TranslateTransition(Duration.seconds(2), car);
+            t.setByX(-300);
+            t.setDelay(Duration.seconds(delay));
+            t.play();
+            delay++;
+        }
+    }
 
 }
