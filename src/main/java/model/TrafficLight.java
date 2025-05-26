@@ -3,7 +3,7 @@ package model;
 public class TrafficLight {
 
     private int greenDuration;   // saniye cinsinden
-    private final int yellowDuration = 3; // sabit 3 saniye
+    private final int yellowDuration = 2; // sabit 3 saniye
     private int redDuration;
 
     private int remainingTime;

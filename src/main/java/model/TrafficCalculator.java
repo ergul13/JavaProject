@@ -3,7 +3,9 @@ package model;
 import java.util.Random;
 import java.util.Set;
 
+
 public class TrafficCalculator {
+
     private static final int TOTAL_CYCLE_TIME = 120;
     private static final int YELLOW_TIME = 3;
     private static final int MIN_GREEN = 10;
@@ -21,8 +23,8 @@ public class TrafficCalculator {
 
     private final Random random = new Random();
 
-    //yardım lazım
     public void setInitialCounts(Integer north, Integer south, Integer east, Integer west) {
+        // Kullanıcıdan veri gelmezse rastgele 0-25 ata
         northCount = (north != null) ? north : random.nextInt(26);
         southCount = (south != null) ? south : random.nextInt(26);
         eastCount  = (east  != null) ? east  : random.nextInt(26);
@@ -43,58 +45,144 @@ public class TrafficCalculator {
     }
 
     public TrafficLight[] calculateInitialLights() {
-        int totalVehicles = northCount + southCount + eastCount + westCount;
-        int availableGreen = TOTAL_CYCLE_TIME - 4 * YELLOW_TIME;
-        if (totalVehicles == 0) totalVehicles = 1;
+        int total = northCount + southCount + eastCount + westCount;
+        int availableGreen = TOTAL_CYCLE_TIME - 4 * YELLOW_TIME; // 108 saniye
+
+        if (total == 0) total = 1; // 0’a bölme hatası engellenir
+
+        // İlk süreleri oranla hesapla
+        double[] rawGreen = new double[4];
+        int[] greenDurations = new int[4];
+        for (Direction d : Direction.values()) {
+            rawGreen[d.ordinal()] = ((double) getCount(d) / total) * availableGreen;
+            greenDurations[d.ordinal()] = (int) Math.floor(rawGreen[d.ordinal()]);
+        }
+
+        // Fazla olanları 60 yap, artan süreyi diğerlerine dağıt
+        boolean needRedistribute;
+        do {
+            needRedistribute = false;
+            int excess = 0;
+            int countBelowLimit = 0;
+
+            // Fazla süreleri bul
+            for (int i = 0; i < 4; i++) {
+                if (greenDurations[i] > MAX_GREEN) {
+                    excess += greenDurations[i] - MAX_GREEN;
+                    greenDurations[i] = MAX_GREEN;
+                    needRedistribute = true;
+                } else if (greenDurations[i] < MIN_GREEN) {
+                    greenDurations[i] = MIN_GREEN; // alt sınır da kontrol edelim
+                }
+            }
+
+            // Fazla süreyi diğerlerine dağıt
+            if (needRedistribute && excess > 0) {
+                // 60’dan az olan kaç tane var?
+                for (int i = 0; i < 4; i++) {
+                    if (greenDurations[i] < MAX_GREEN) countBelowLimit++;
+                }
+                if (countBelowLimit == 0) break; // Dağıtacak kimse yok
+
+                int addPerDirection = excess / countBelowLimit;
+                int remainder = excess % countBelowLimit;
+
+                for (int i = 0; i < 4; i++) {
+                    if (greenDurations[i] < MAX_GREEN) {
+                        greenDurations[i] += addPerDirection;
+                        if (greenDurations[i] > MAX_GREEN) {
+                            // Burada overflow olursa döngü devam edecek
+                            needRedistribute = true;
+                        }
+                        if (remainder > 0) {
+                            greenDurations[i]++;
+                            remainder--;
+                        }
+                    }
+                }
+            }
+
+        } while (needRedistribute);
+
+        // Eğer toplam süre 108'den azsa, en yoğun yöne ekle
+        int sum = 0;
+        for (int i = 0; i < 4; i++) sum += greenDurations[i];
+        int diff = availableGreen - sum;
+        if (diff > 0) {
+            // En yoğun yönü bul
+            Direction maxDir = Direction.NORTH;
+            int maxCount = -1;
+            for (Direction d : Direction.values()) {
+                int c = getCount(d);
+                if (c > maxCount) {
+                    maxCount = c;
+                    maxDir = d;
+                }
+            }
+            greenDurations[maxDir.ordinal()] += diff;
+            if (greenDurations[maxDir.ordinal()] > MAX_GREEN) {
+                greenDurations[maxDir.ordinal()] = MAX_GREEN;
+            }
+        }
+
+        // TrafficLight dizisi oluştur ve ayarla
         TrafficLight[] lights = new TrafficLight[4];
-        lights[0] = createTrafficLight(scaleGreen(northCount, totalVehicles, availableGreen));
-        lights[1] = createTrafficLight(scaleGreen(southCount, totalVehicles, availableGreen));
-        lights[2] = createTrafficLight(scaleGreen(eastCount, totalVehicles, availableGreen));
-        lights[3] = createTrafficLight(scaleGreen(westCount, totalVehicles, availableGreen));
+        for (Direction d : Direction.values()) {
+            lights[d.ordinal()] = createTrafficLight(greenDurations[d.ordinal()]);
+        }
+
         return lights;
     }
 
+
     public TrafficLight[] calculateLightsFromDirections(Set<Direction> directions, int availableGreen) {
-        int totalVehicles = 0;
+        int total = 0;
         for (Direction dir : directions) {
-            totalVehicles += getCount(dir);
+            total += getCount(dir);
         }
-        if (totalVehicles == 0) totalVehicles = 1;
+        if (total == 0) total = 1;
+
         int[] greenDurations = new int[4];
         double[] rawValues = new double[4];
         int sum = 0;
+
         for (Direction dir : directions) {
             int count = getCount(dir);
-            double raw = (count / (double) totalVehicles) * availableGreen;
-            int green = (int) Math.floor(raw);
+            double raw = (count / (double) total) * availableGreen;
+            int g = (int) Math.floor(raw);
             rawValues[dir.ordinal()] = raw;
-            greenDurations[dir.ordinal()] = Math.max(MIN_GREEN, Math.min(MAX_GREEN, green));
+            greenDurations[dir.ordinal()] = Math.max(10, Math.min(60, g));
             sum += greenDurations[dir.ordinal()];
         }
+
+        // Kalan saniyeyi yoğun yönlere dağıt
         int diff = availableGreen - sum;
         while (diff > 0) {
             Direction max = directions.stream().max((a, b) -> Integer.compare(getCount(a), getCount(b))).orElse(Direction.NORTH);
-            if (greenDurations[max.ordinal()] < MAX_GREEN) {
+            if (greenDurations[max.ordinal()] < 60) {
                 greenDurations[max.ordinal()]++;
                 diff--;
             } else {
-                break;
+                break; // artık eklenemiyor
             }
         }
+
         TrafficLight[] lights = new TrafficLight[4];
         for (Direction dir : Direction.values()) {
             if (directions.contains(dir)) {
                 lights[dir.ordinal()] = createTrafficLight(greenDurations[dir.ordinal()]);
             } else {
-                lights[dir.ordinal()] = createTrafficLight(0);
+                lights[dir.ordinal()] = createTrafficLight(0); // yanmayacak yön
             }
         }
         return lights;
     }
 
+
+
     private int scaleGreen(int count, int total, int availableGreen) {
-        int green = (int) ((count / (double) total) * availableGreen);
-        return Math.max(MIN_GREEN, Math.min(MAX_GREEN, green));
+        int g = (int) ((count / (double) total) * availableGreen);
+        return Math.max(MIN_GREEN, Math.min(MAX_GREEN, g));
     }
 
     public int getCount(Direction d) {
@@ -109,6 +197,7 @@ public class TrafficCalculator {
     public Direction getMostCrowdedDirectionExcluding(Direction exclude) {
         int max = -1;
         Direction result = Direction.NORTH;
+
         for (Direction dir : Direction.values()) {
             if (dir == exclude) continue;
             int count = getCount(dir);
@@ -117,6 +206,7 @@ public class TrafficCalculator {
                 result = dir;
             }
         }
+
         return result;
     }
 }
