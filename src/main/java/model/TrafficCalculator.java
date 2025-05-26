@@ -21,6 +21,7 @@ public class TrafficCalculator {
 
     private final Random random = new Random();
 
+    //yardım lazım
     public void setInitialCounts(Integer north, Integer south, Integer east, Integer west) {
         northCount = (north != null) ? north : random.nextInt(26);
         southCount = (south != null) ? south : random.nextInt(26);
