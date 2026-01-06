@@ -9,6 +9,11 @@ module odev.odev {
     opens controller to javafx.fxml;
     exports model;
     opens model to javafx.fxml;
+    exports model.strategy;
+    exports model.config;
+    exports model.analytics;
+    exports model.sensor;
+    exports model.export;
     exports view;
     opens view to javafx.fxml;
 
