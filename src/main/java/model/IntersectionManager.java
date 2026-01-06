@@ -87,35 +87,49 @@ public class IntersectionManager {
                 .mapToInt(Integer::intValue)
                 .sum();
 
+        System.out.println("\n=== GREEN LIGHT CALCULATION ===");
+        System.out.println("Total vehicles: " + totalVehicles);
+
         if (totalVehicles == 0) {
             // No vehicles, equal distribution
             for (Direction dir : Direction.values()) {
                 trafficLights.get(dir).setGreenDuration(MIN_GREEN_TIME);
+                System.out.println(dir + ": " + MIN_GREEN_TIME + "s (minimum - no vehicles)");
             }
             return;
         }
 
         // Available time for green lights (total - yellows)
         int availableGreenTime = TOTAL_CYCLE_TIME - (Direction.values().length * YELLOW_LIGHT_DURATION);
+        System.out.println("Available green time: " + availableGreenTime + "s (120 - 12)");
 
         // First pass: proportional allocation
         Map<Direction, Integer> allocatedTime = new EnumMap<>(Direction.class);
         int totalAllocated = 0;
 
+        System.out.println("\nProportional allocation:");
         for (Direction dir : Direction.values()) {
-            double proportion = (double) vehicleDensity.get(dir) / totalVehicles;
-            int greenTime = (int) Math.round(proportion * availableGreenTime);
+            int dirVehicles = vehicleDensity.get(dir);
+            double proportion = (double) dirVehicles / totalVehicles;
+            int rawGreenTime = (int) Math.round(proportion * availableGreenTime);
 
             // Apply constraints
-            greenTime = Math.max(MIN_GREEN_TIME, Math.min(MAX_GREEN_TIME, greenTime));
+            int greenTime = Math.max(MIN_GREEN_TIME, Math.min(MAX_GREEN_TIME, rawGreenTime));
 
             allocatedTime.put(dir, greenTime);
             totalAllocated += greenTime;
+
+            System.out.printf("%s: %d vehicles (%.1f%%) -> %d sec (raw: %d)%n",
+                    dir, dirVehicles, proportion * 100, greenTime, rawGreenTime);
         }
+
+        System.out.println("\nTotal allocated: " + totalAllocated + "s");
 
         // Adjust if total doesn't match available time
         int difference = availableGreenTime - totalAllocated;
         if (difference != 0) {
+            System.out.println("Adjusting difference: " + difference + "s");
+
             // Distribute difference proportionally to directions with most vehicles
             List<Direction> sortedDirs = new ArrayList<>(Arrays.asList(Direction.values()));
             sortedDirs.sort((d1, d2) -> vehicleDensity.get(d2).compareTo(vehicleDensity.get(d1)));
@@ -132,14 +146,22 @@ public class IntersectionManager {
                 if (newTime >= MIN_GREEN_TIME && newTime <= MAX_GREEN_TIME) {
                     allocatedTime.put(dir, newTime);
                     remaining--;
+                    System.out.println("  " + dir + ": " + current + " -> " + newTime);
                 }
             }
         }
 
         // Set calculated durations
+        System.out.println("\nFinal allocations:");
+        int finalTotal = 0;
         for (Direction dir : Direction.values()) {
-            trafficLights.get(dir).setGreenDuration(allocatedTime.get(dir));
+            int duration = allocatedTime.get(dir);
+            trafficLights.get(dir).setGreenDuration(duration);
+            finalTotal += duration;
+            System.out.println(dir + ": " + duration + "s");
         }
+        System.out.println("Final total: " + finalTotal + "s");
+        System.out.println("=== END CALCULATION ===\n");
     }
 
     /**
@@ -184,8 +206,10 @@ public class IntersectionManager {
             List<Vehicle> dirVehicles = vehicles.get(dir);
 
             for (int i = 0; i < count; i++) {
-                // Position vehicles in a queue (0.0 = at stop line, negative = behind)
-                double position = -0.05 * (count - i - 1);
+                // Position vehicles in a queue behind stop line
+                // Stop line is at position 0, vehicles start behind (negative positions)
+                double spacing = 0.05; // 5% spacing between vehicles
+                double position = -spacing * (i + 1);
                 Vehicle vehicle = new Vehicle(dir, nextVehicleId++, position);
                 dirVehicles.add(vehicle);
             }
@@ -213,9 +237,16 @@ public class IntersectionManager {
         activeLight.tick();
         elapsedCycleTime++;
 
-        // Move vehicles if green light
+        // Move vehicles in active direction if green light
         if (activeLight.getCurrentColor() == LightColor.GREEN) {
             moveVehicles(currentActiveDirection);
+        }
+
+        // Also move vehicles that are already crossing (position >= 0) regardless of light
+        for (Direction dir : Direction.values()) {
+            if (dir != currentActiveDirection) {
+                moveVehiclesInIntersection(dir);
+            }
         }
 
         // Check if current phase is complete
@@ -241,25 +272,50 @@ public class IntersectionManager {
     }
 
     /**
+     * Move vehicles that are already in the intersection (position >= 0)
+     */
+    private void moveVehiclesInIntersection(Direction direction) {
+        List<Vehicle> dirVehicles = vehicles.get(direction);
+        double speed = 0.015;
+
+        for (Vehicle vehicle : dirVehicles) {
+            if (vehicle.hasCrossed()) continue;
+
+            // Only move vehicles that are already in/past the intersection
+            if (vehicle.getPosition() >= 0) {
+                vehicle.move(speed);
+            }
+        }
+    }
+
+    /**
      * Move vehicles in the specified direction
      */
     private void moveVehicles(Direction direction) {
         List<Vehicle> dirVehicles = vehicles.get(direction);
+        double speed = 0.015; // Base speed (1.5% of road per second)
+        double minDistance = 0.04; // Minimum distance between vehicles
 
-        // Move vehicles forward
+        // Move vehicles forward (iterate from front to back)
         for (int i = 0; i < dirVehicles.size(); i++) {
             Vehicle vehicle = dirVehicles.get(i);
             if (vehicle.hasCrossed()) continue;
 
-            // Calculate movement speed
-            double speed = 0.02; // Base speed
+            // Check if vehicle is at stop line and light is not green
+            TrafficLight light = trafficLights.get(direction);
+            if (vehicle.getPosition() < 0 && light.getCurrentColor() != LightColor.GREEN) {
+                continue; // Don't move if waiting at red/yellow
+            }
 
             // Check if blocked by vehicle ahead
             boolean blocked = false;
             if (i > 0) {
                 Vehicle ahead = dirVehicles.get(i - 1);
-                if (!ahead.hasCrossed() && ahead.getPosition() - vehicle.getPosition() < 0.05) {
-                    blocked = true;
+                if (!ahead.hasCrossed()) {
+                    double gap = ahead.getPosition() - vehicle.getPosition();
+                    if (gap < minDistance) {
+                        blocked = true;
+                    }
                 }
             }
 

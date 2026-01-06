@@ -35,6 +35,12 @@ public class TrafficSimulationView extends BorderPane {
     // Labels for countdown timers
     private Map<Direction, Label> timerLabels;
 
+    // Labels for vehicle counts
+    private Map<Direction, Label> vehicleCountLabels;
+
+    // Labels for green time durations
+    private Map<Direction, Label> greenTimeLabels;
+
     // Control buttons
     private Button startButton;
     private Button pauseButton;
@@ -57,6 +63,8 @@ public class TrafficSimulationView extends BorderPane {
     public TrafficSimulationView() {
         this.densityInputs = new EnumMap<>(Direction.class);
         this.timerLabels = new EnumMap<>(Direction.class);
+        this.vehicleCountLabels = new EnumMap<>(Direction.class);
+        this.greenTimeLabels = new EnumMap<>(Direction.class);
         this.currentLights = new EnumMap<>(Direction.class);
         this.currentVehicles = new EnumMap<>(Direction.class);
 
@@ -176,14 +184,26 @@ public class TrafficSimulationView extends BorderPane {
             timerLabel.setFont(Font.font("Monospace", 12));
             timerLabel.setStyle("-fx-text-fill: #666666;");
 
+            // Vehicle count label
+            Label countLabel = new Label("Waiting: 0");
+            countLabel.setFont(Font.font("Arial", 11));
+            countLabel.setStyle("-fx-text-fill: #555555;");
+
+            // Green time allocation label
+            Label greenLabel = new Label("Green: -- sec");
+            greenLabel.setFont(Font.font("Arial", 10));
+            greenLabel.setStyle("-fx-text-fill: #008800;");
+
             densityInputs.put(dir, textField);
             timerLabels.put(dir, timerLabel);
+            vehicleCountLabels.put(dir, countLabel);
+            greenTimeLabels.put(dir, greenLabel);
 
             HBox inputRow = new HBox(10);
             inputRow.setAlignment(Pos.CENTER_LEFT);
             inputRow.getChildren().addAll(textField, timerLabel);
 
-            dirBox.getChildren().addAll(dirLabel, inputRow);
+            dirBox.getChildren().addAll(dirLabel, inputRow, countLabel, greenLabel);
             panel.getChildren().add(dirBox);
         }
 
@@ -394,6 +414,7 @@ public class TrafficSimulationView extends BorderPane {
         double carWidth = 20;
         double carHeight = 35;
         double laneOffset = roadWidth / 4;
+        double maxDistance = 250; // Maximum distance to render vehicles
 
         double x = 0, y = 0;
 
@@ -401,23 +422,40 @@ public class TrafficSimulationView extends BorderPane {
         switch (dir) {
             case NORTH:
                 x = centerX - laneOffset;
-                y = centerY - roadWidth / 2 - position * (centerY - roadWidth / 2);
+                // Negative position = behind stop line, positive = crossing/crossed
+                if (position < 0) {
+                    y = centerY - roadWidth / 2 + position * maxDistance;
+                } else {
+                    y = centerY - roadWidth / 2 - position * (centerY - roadWidth / 2);
+                }
                 break;
             case SOUTH:
                 x = centerX + laneOffset;
-                y = centerY + roadWidth / 2 + position * (centerY - roadWidth / 2);
+                if (position < 0) {
+                    y = centerY + roadWidth / 2 - position * maxDistance;
+                } else {
+                    y = centerY + roadWidth / 2 + position * (centerY - roadWidth / 2);
+                }
                 break;
             case EAST:
-                x = centerX + roadWidth / 2 + position * (centerX - roadWidth / 2);
                 y = centerY - laneOffset;
+                if (position < 0) {
+                    x = centerX + roadWidth / 2 - position * maxDistance;
+                } else {
+                    x = centerX + roadWidth / 2 + position * (centerX - roadWidth / 2);
+                }
                 // Swap dimensions for horizontal
                 double temp = carWidth;
                 carWidth = carHeight;
                 carHeight = temp;
                 break;
             case WEST:
-                x = centerX - roadWidth / 2 - position * (centerX - roadWidth / 2);
                 y = centerY + laneOffset;
+                if (position < 0) {
+                    x = centerX - roadWidth / 2 + position * maxDistance;
+                } else {
+                    x = centerX - roadWidth / 2 - position * (centerX - roadWidth / 2);
+                }
                 // Swap dimensions for horizontal
                 temp = carWidth;
                 carWidth = carHeight;
@@ -425,7 +463,17 @@ public class TrafficSimulationView extends BorderPane {
                 break;
         }
 
-        // Draw car
+        // Only draw if within canvas bounds
+        if (x < -50 || x > intersectionCanvas.getWidth() + 50 ||
+            y < -50 || y > intersectionCanvas.getHeight() + 50) {
+            return;
+        }
+
+        // Draw car shadow
+        gc.setFill(Color.rgb(0, 0, 0, 0.2));
+        gc.fillRoundRect(x - carWidth / 2 + 2, y - carHeight / 2 + 2, carWidth, carHeight, 3, 3);
+
+        // Draw car body
         gc.setFill(Color.BLUE);
         gc.fillRoundRect(x - carWidth / 2, y - carHeight / 2, carWidth, carHeight, 3, 3);
 
@@ -433,6 +481,14 @@ public class TrafficSimulationView extends BorderPane {
         gc.setStroke(Color.DARKBLUE);
         gc.setLineWidth(1);
         gc.strokeRoundRect(x - carWidth / 2, y - carHeight / 2, carWidth, carHeight, 3, 3);
+
+        // Draw car windows
+        gc.setFill(Color.LIGHTBLUE);
+        if (dir == Direction.NORTH || dir == Direction.SOUTH) {
+            gc.fillRoundRect(x - carWidth / 2 + 3, y - carHeight / 2 + 3, carWidth - 6, carHeight / 3, 2, 2);
+        } else {
+            gc.fillRoundRect(x - carWidth / 2 + 3, y - carHeight / 2 + 3, carWidth / 3, carHeight - 6, 2, 2);
+        }
     }
 
     /**
@@ -484,10 +540,24 @@ public class TrafficSimulationView extends BorderPane {
     }
 
     /**
+     * Update green time allocation display
+     */
+    public void updateGreenTimeAllocation(Direction direction, int greenDuration) {
+        Label greenLabel = greenTimeLabels.get(direction);
+        greenLabel.setText("Green: " + greenDuration + " sec");
+    }
+
+    /**
      * Update vehicles display
      */
     public void updateVehicles(Direction direction, List<Vehicle> vehicles) {
         currentVehicles.put(direction, vehicles);
+
+        // Update vehicle count label
+        long waitingCount = vehicles.stream().filter(v -> !v.hasCrossed()).count();
+        Label countLabel = vehicleCountLabels.get(direction);
+        countLabel.setText("Waiting: " + waitingCount);
+
         drawIntersection();
     }
 

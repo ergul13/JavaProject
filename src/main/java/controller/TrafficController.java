@@ -57,6 +57,13 @@ public class TrafficController {
 
                 // Start cycle
                 model.startCycle();
+
+                // Update green time allocations
+                for (Direction dir : Direction.values()) {
+                    TrafficLight light = model.getTrafficLight(dir);
+                    view.updateGreenTimeAllocation(dir, light.getGreenDuration());
+                }
+
                 simulationTimeline.play();
                 updateView();
             }
