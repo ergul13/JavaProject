@@ -13,7 +13,6 @@ module odev.odev {
     exports model.config;
     exports model.analytics;
     exports model.sensor;
-    exports model.export;
     exports view;
     opens view to javafx.fxml;
 
