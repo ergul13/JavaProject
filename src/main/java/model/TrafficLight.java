@@ -1,68 +1,64 @@
 package model;
 
+/**
+ * Model class representing a traffic light for one direction
+ */
 public class TrafficLight {
+    private final Direction direction;
+    private LightColor currentColor;
+    private int remainingTime; // in seconds
+    private int greenDuration; // allocated green time in seconds
 
-    private int greenDuration;   // saniye cinsinden
-    private final int yellowDuration = 2; // sabit 3 saniye
-    private int redDuration;
-
-    private int remainingTime;
-    private LightState state;
-
-    public enum LightState {
-        GREEN, YELLOW, RED
-    }
-
-    public TrafficLight() {
-        this.greenDuration = 0;
-        this.redDuration = 0;
+    public TrafficLight(Direction direction) {
+        this.direction = direction;
+        this.currentColor = LightColor.RED;
         this.remainingTime = 0;
-        this.state = LightState.RED; // başlangıç durumu
+        this.greenDuration = 0;
     }
 
-    public void setGreenDuration(int seconds) {
-        this.greenDuration = seconds;
-        this.redDuration = 120 - seconds - yellowDuration;
+    public Direction getDirection() {
+        return direction;
     }
 
-    public int getGreenDuration() {
-        return greenDuration;
+    public LightColor getCurrentColor() {
+        return currentColor;
     }
 
-    public int getYellowDuration() {
-        return yellowDuration;
-    }
-
-    public int getRedDuration() {
-        return redDuration;
+    public void setCurrentColor(LightColor color) {
+        this.currentColor = color;
     }
 
     public int getRemainingTime() {
         return remainingTime;
     }
 
-    public void setRemainingTime(int remainingTime) {
-        this.remainingTime = remainingTime;
+    public void setRemainingTime(int time) {
+        this.remainingTime = time;
     }
 
-    public LightState getState() {
-        return state;
+    public int getGreenDuration() {
+        return greenDuration;
     }
 
-    public void setState(LightState state) {
-        this.state = state;
-        if (state == LightState.GREEN) {
-            remainingTime = greenDuration;
-        } else if (state == LightState.YELLOW) {
-            remainingTime = yellowDuration;
-        } else {
-            remainingTime = redDuration;
-        }
+    public void setGreenDuration(int duration) {
+        this.greenDuration = duration;
     }
 
+    /**
+     * Decrement remaining time by 1 second
+     */
     public void tick() {
         if (remainingTime > 0) {
             remainingTime--;
         }
     }
+
+    /**
+     * Reset light to red
+     */
+    public void reset() {
+        this.currentColor = LightColor.RED;
+        this.remainingTime = 0;
+    }
 }
+

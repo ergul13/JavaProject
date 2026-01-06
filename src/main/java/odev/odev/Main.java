@@ -1,34 +1,54 @@
 package odev.odev;
 
+import controller.TrafficController;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.IntersectionManager;
+import view.TrafficSimulationView;
 
+/**
+ * Main Application Entry Point
+ * Traffic Light Control System Based on Vehicle Density
+ *
+ * Architecture: Model-View-Controller (MVC)
+ * - Model: IntersectionManager, TrafficLight, Vehicle, Direction
+ * - View: TrafficSimulationView
+ * - Controller: TrafficController
+ *
+ * @author Senior Java Developer
+ * @version 1.0
+ */
 public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        // FXML dosyasını doğru konumdan yükle
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/odev/odev/hello-view.fxml"));
+        // Create Model
+        IntersectionManager model = new IntersectionManager();
 
-        // Sahneyi oluştur (1280x720 önerilen pencere boyutu)
-        Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
+        // Create View
+        TrafficSimulationView view = new TrafficSimulationView();
 
-        // Başlık ve sahne ayarları
-        stage.setTitle("Trafik Kontrol Sistemi");
+        // Create Controller (binds Model and View)
+        TrafficController controller = new TrafficController(model, view);
+
+        // Initialize controller
+        controller.start();
+
+        // Create Scene
+        Scene scene = new Scene(view, 1280, 720);
+
+        // Configure Stage
+        stage.setTitle("Traffic Light Control System - Vehicle Density Based");
         stage.setScene(scene);
-
-        // Kapatma düğmeleri ve pencere çerçevesi aktif
         stage.setResizable(true);
-        stage.centerOnScreen();  // Ortala
+        stage.centerOnScreen();
 
-        // Göster
+        // Show
         stage.show();
-        //Fatih
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 }
