@@ -417,140 +417,81 @@ public class TrafficView extends BorderPane {
 
             double x = car.getX();
             double y = car.getY();
+            double angle = car.getAngle();
 
             // Araç gövdesi
             gc.setFill(car.getColor());
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(1);
 
-            Direction currentDir = car.getDirection();
-
-            switch (currentDir) {
-                case NORTH:
-                case SOUTH:
-                    // Dikey araç
-                    drawVerticalCar(gc, x, y, currentDir == Direction.NORTH, car.getTurnDirection());
-                    break;
-                case EAST:
-                case WEST:
-                    // Yatay araç
-                    drawHorizontalCar(gc, x, y, currentDir == Direction.WEST, car.getTurnDirection());
-                    break;
-            }
+            // Araç merkezinden döndürerek çiz
+            drawRotatedCar(gc, x, y, angle, car.getColor(), car.getTurnDirection());
         }
     }
 
     /**
-     * Dikey araç çizer.
+     * Açıya göre döndürülmüş araç çizer.
+     * @param gc GraphicsContext
+     * @param x Araç x pozisyonu (sol üst köşe)
+     * @param y Araç y pozisyonu (sol üst köşe)
+     * @param angle Döndürme açısı (derece)
+     * @param carColor Araç rengi
+     * @param turn Dönüş yönü (sinyal için)
      */
-    private void drawVerticalCar(GraphicsContext gc, double x, double y, boolean facingUp, TurnDirection turn) {
+    private void drawRotatedCar(GraphicsContext gc, double x, double y, double angle, Color carColor, TurnDirection turn) {
         int w = Car.CAR_WIDTH;
         int h = Car.CAR_LENGTH;
 
-        // Gövde
-        gc.fillRoundRect(x, y, w, h, 5, 5);
-        gc.strokeRoundRect(x, y, w, h, 5, 5);
+        // Aracın merkez noktası
+        double centerX = x + w / 2.0;
+        double centerY = y + h / 2.0;
 
-        // Pencereler
+        // Canvas state'i kaydet
+        gc.save();
+
+        // Merkeze taşı, döndür, geri taşı
+        gc.translate(centerX, centerY);
+        gc.rotate(-angle); // Negatif çünkü JavaFX saat yönünde döndürür
+        gc.translate(-w / 2.0, -h / 2.0);
+
+        // Araç gövdesi
+        gc.setFill(carColor);
+        gc.fillRoundRect(0, 0, w, h, 5, 5);
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(1);
+        gc.strokeRoundRect(0, 0, w, h, 5, 5);
+
+        // Ön cam (yukarı bakan taraf)
         gc.setFill(Color.LIGHTBLUE);
-        if (facingUp) {
-            gc.fillRect(x + 3, y + 5, w - 6, 10);  // Ön cam
-            gc.fillRect(x + 3, y + h - 15, w - 6, 8);  // Arka cam
-        } else {
-            gc.fillRect(x + 3, y + h - 15, w - 6, 10);  // Ön cam
-            gc.fillRect(x + 3, y + 7, w - 6, 8);  // Arka cam
-        }
+        gc.fillRect(3, 5, w - 6, 10);
 
-        // Farlar
+        // Arka cam
+        gc.fillRect(3, h - 15, w - 6, 8);
+
+        // Farlar (önde)
         gc.setFill(Color.YELLOW);
-        if (facingUp) {
-            gc.fillOval(x + 3, y + h - 5, 5, 5);
-            gc.fillOval(x + w - 8, y + h - 5, 5, 5);
-        } else {
-            gc.fillOval(x + 3, y, 5, 5);
-            gc.fillOval(x + w - 8, y, 5, 5);
-        }
+        gc.fillOval(3, h - 5, 5, 5);
+        gc.fillOval(w - 8, h - 5, 5, 5);
 
-        // Dönüş yönü göstergesi (sinyal lambası)
-        drawTurnIndicator(gc, x, y, w, h, turn, true, facingUp);
-    }
+        // Stop lambaları (arkada)
+        gc.setFill(Color.DARKRED);
+        gc.fillOval(3, 0, 4, 4);
+        gc.fillOval(w - 7, 0, 4, 4);
 
-    /**
-     * Yatay araç çizer.
-     */
-    private void drawHorizontalCar(GraphicsContext gc, double x, double y, boolean facingRight, TurnDirection turn) {
-        int w = Car.CAR_LENGTH;
-        int h = Car.CAR_WIDTH;
-
-        // Gövde
-        gc.fillRoundRect(x, y, w, h, 5, 5);
-        gc.strokeRoundRect(x, y, w, h, 5, 5);
-
-        // Pencereler
-        gc.setFill(Color.LIGHTBLUE);
-        if (facingRight) {
-            gc.fillRect(x + w - 15, y + 3, 10, h - 6);  // Ön cam
-            gc.fillRect(x + 7, y + 3, 8, h - 6);  // Arka cam
-        } else {
-            gc.fillRect(x + 5, y + 3, 10, h - 6);  // Ön cam
-            gc.fillRect(x + w - 15, y + 3, 8, h - 6);  // Arka cam
-        }
-
-        // Farlar
-        gc.setFill(Color.YELLOW);
-        if (facingRight) {
-            gc.fillOval(x + w - 5, y + 3, 5, 5);
-            gc.fillOval(x + w - 5, y + h - 8, 5, 5);
-        } else {
-            gc.fillOval(x, y + 3, 5, 5);
-            gc.fillOval(x, y + h - 8, 5, 5);
-        }
-
-        // Dönüş yönü göstergesi
-        drawTurnIndicator(gc, x, y, w, h, turn, false, facingRight);
-    }
-
-    /**
-     * Dönüş sinyali göstergesi çizer.
-     */
-    private void drawTurnIndicator(GraphicsContext gc, double x, double y, int w, int h,
-                                   TurnDirection turn, boolean isVertical, boolean facingPositive) {
-        if (turn == TurnDirection.STRAIGHT) return;
-
-        gc.setFill(Color.ORANGE);
-
-        if (isVertical) {
-            // Dikey araç
-            if (facingPositive) { // Yukarı gidiyor
-                if (turn == TurnDirection.LEFT) {
-                    gc.fillOval(x - 2, y + h - 10, 4, 4);
-                } else {
-                    gc.fillOval(x + w - 2, y + h - 10, 4, 4);
-                }
-            } else { // Aşağı gidiyor
-                if (turn == TurnDirection.LEFT) {
-                    gc.fillOval(x + w - 2, y + 6, 4, 4);
-                } else {
-                    gc.fillOval(x - 2, y + 6, 4, 4);
-                }
-            }
-        } else {
-            // Yatay araç
-            if (facingPositive) { // Sağa gidiyor
-                if (turn == TurnDirection.LEFT) {
-                    gc.fillOval(x + w - 10, y - 2, 4, 4);
-                } else {
-                    gc.fillOval(x + w - 10, y + h - 2, 4, 4);
-                }
-            } else { // Sola gidiyor
-                if (turn == TurnDirection.LEFT) {
-                    gc.fillOval(x + 6, y + h - 2, 4, 4);
-                } else {
-                    gc.fillOval(x + 6, y - 2, 4, 4);
-                }
+        // Dönüş sinyali
+        if (turn != TurnDirection.STRAIGHT) {
+            gc.setFill(Color.ORANGE);
+            if (turn == TurnDirection.LEFT) {
+                gc.fillOval(-2, h - 10, 4, 4);  // Sol sinyal
+            } else {
+                gc.fillOval(w - 2, h - 10, 4, 4);  // Sağ sinyal
             }
         }
+
+        // Canvas state'i geri yükle
+        gc.restore();
     }
+
 
     /**
      * Bilgi panelini günceller.

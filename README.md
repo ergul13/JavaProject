@@ -1,99 +1,179 @@
-# Trafik Isigi Kontrol Sistemi - Arac Yogunluguna Dayali
+# 🚦 Akıllı Trafik Işığı Kontrol Sistemi
 
-## Proje Ozeti
-
-Bu proje, dort yonlu bir kavsak icin arac yogunluguna gore dinamik olarak calisan bir trafik isigi simülasyonu sunmaktadir. JavaFX kullanilarak gelistirilmis olup, MVC (Model-View-Controller) mimarisine siki sikiya baglidir.
-
-## Mimari Yapi
-
-Proje uc ana katmandan olusmaktadir:
-
-### Model Katmani
-- **Direction**: Dort yonu temsil eden enum (NORTH, SOUTH, EAST, WEST)
-- **LightColor**: Isik renklerini temsil eden enum (RED, YELLOW, GREEN)
-- **SignalPhase**: Sinyal fazlarini temsil eden enum
-- **TrafficLight**: Trafik isiginin durumunu ve kalan suresini tutan sinif
-- **Vehicle**: Araclarin konumunu ve durumunu tutan sinif
-- **TrafficState**: Tum simülasyon durumunu yoneten sinif
-- **TimingCalculator**: Yesil isik surelerini hesaplayan sinif
-
-### View Katmani
-- **TrafficSimulationView**: Tum gorsel bilesenleri iceren JavaFX arayuzu
-
-### Controller Katmani
-- **TrafficController**: Kullanici etkilesimlerini ve simülasyon akisini yoneten sinif
-
-## Nasil Calistirilir
-
-### Gereksinimler
-- Java 21 veya ustu
-- Maven
-
-### Calistirma Adimlari
-
-1. Projeyi derleyin:
-```
-./mvnw clean compile
-```
-
-2. Uygulamayi baslatin:
-```
-./mvnw javafx:run
-```
-
-### Kullanim
-
-1. Her yon icin arac sayisini manuel olarak girin veya "Random" butonuna tiklayarak rastgele degerler uretin
-2. "Start" butonuna tiklayarak simülasyonu baslatin
-3. "Pause" butonu ile simülasyonu durdurup devam ettirebilirsiniz
-4. "Reset" butonu ile simülasyonu sifirlayin
-
-## Temel Tasarim Kararlari
-
-### Zamanlama Hesaplamasi
-- Toplam cevrim suresi: 120 saniye (sabit)
-- Sari isik suresi: 3 saniye (sabit)
-- Yesil isik suresi: Arac yogunluguna orantili olarak hesaplanir
-- Minimum yesil sure: 10 saniye
-- Maksimum yesil sure: 60 saniye
-
-### Hesaplama Formulu
-1. Toplam sari suresi = 4 yon x 3 saniye = 12 saniye
-2. Kullanilabilir yesil sure = 120 - 12 = 108 saniye
-3. Her yon icin yesil sure = (yondeki arac / toplam arac) x 108 saniye
-4. Sonuc 10-60 saniye araligina sinirlandirilir
-
-### Arac Davranisi
-- Araclar kirmizi isikta durur
-- Yesil isikta hareket eder
-- Kavsagi gectikten sonra sahneden silinir
-- Araclar birbirine carpmaz
+Araç yoğunluğuna dayalı, dinamik yeşil ışık süresi hesaplayan ve gerçekçi araç simülasyonu sunan bir trafik kontrol sistemi.
 
 ---
 
-# Traffic Light Control System - Based on Vehicle Density
+## 📋 Proje Hakkında
 
-## Project Summary
+Bu proje, dört yönlü bir kavşakta araç yoğunluğunu analiz ederek yeşil ışık sürelerini dinamik olarak hesaplayan ve trafik akışını görsel olarak simüle eden bir sistemdir. JavaFX kullanılarak geliştirilmiş olup, **MVC (Model-View-Controller)** mimarisine ve **OOP (Nesne Yönelimli Programlama)** prensiplerine uygun olarak tasarlanmıştır.
 
-This project provides a traffic light simulation for a four-way intersection that dynamically operates based on vehicle density. Developed using JavaFX, it strictly adheres to the MVC (Model-View-Controller) architecture.
+### ✨ Temel Özellikler
 
-## Architecture
+- **Dinamik Yeşil Işık Hesaplama**: Her yönün yeşil ışık süresi, araç yoğunluğu oranına göre otomatik hesaplanır
+- **Gerçekçi Araç Hareketi**: Araçlar şerit merkezinden ilerler ve kavşakta kavisli (Bezier eğrisi) dönüşler yapar
+- **Sağa-Sola Dönüş Desteği**: Araçlar rastgele olarak düz, sağa veya sola dönüş yapabilir
+- **Saat Yönünde Trafik Akışı**: Işıklar Kuzey → Doğu → Güney → Batı sırasıyla değişir
+- **Çarpışma Önleme**: Araçlar arası güvenli mesafe korunur
+- **Geri Sayım Göstergesi**: Her ışık için kalan süre dijital olarak gösterilir
 
-The project consists of three main layers:
+---
 
-### Model Layer
-- **Direction**: Enum representing four directions (NORTH, SOUTH, EAST, WEST)
-- **LightColor**: Enum representing light colors (RED, YELLOW, GREEN)
-- **SignalPhase**: Enum representing signal phases
-- **TrafficLight**: Class holding traffic light state and remaining time
-- **Vehicle**: Class holding vehicle position and state
-- **TrafficState**: Class managing the entire simulation state
-- **TimingCalculator**: Class calculating green light durations
+## 🏗️ Mimari Yapı
 
-### View Layer
-- **TrafficSimulationView**: JavaFX interface containing all visual components
+Proje, **MVC tasarım deseni** kullanılarak üç ana katmana ayrılmıştır:
 
-### Controller Layer
+```
+src/main/java/com/traffic/
+├── Launcher.java           # Uygulama giriş noktası
+├── TrafficLightSystem.java # JavaFX Application sınıfı
+├── model/                  # Model Katmanı
+│   ├── Car.java           # Araç sınıfı (pozisyon, hız, dönüş mantığı)
+│   ├── Direction.java     # Yön enum'u (NORTH, SOUTH, EAST, WEST)
+│   ├── LightState.java    # Işık durumu enum'u (RED, YELLOW, GREEN)
+│   ├── TrafficLight.java  # Trafik ışığı sınıfı
+│   ├── TrafficModel.java  # Ana model sınıfı (simülasyon mantığı)
+│   └── TurnDirection.java # Dönüş yönü enum'u (STRAIGHT, LEFT, RIGHT)
+├── view/                   # View Katmanı
+│   └── TrafficView.java   # Görsel arayüz (Canvas, kontrol paneli)
+└── controller/             # Controller Katmanı
+    └── TrafficController.java # Kullanıcı etkileşimi ve oyun döngüsü
+```
+
+### Model Katmanı
+
+| Sınıf | Açıklama |
+|-------|----------|
+| `Car` | Araç pozisyonu, hızı, dönüş yönü ve Bezier eğrisi ile kavisli dönüş mantığını içerir |
+| `Direction` | Dört ana yönü (Kuzey, Güney, Doğu, Batı) temsil eder |
+| `TrafficLight` | Her yön için ışık durumu ve geri sayım bilgisini tutar |
+| `TrafficModel` | Tüm simülasyon mantığını, faz yönetimini ve yeşil ışık süre hesaplamasını içerir |
+
+### View Katmanı
+
+`TrafficView` sınıfı, JavaFX Canvas kullanarak:
+- Kavşak ve yolları çizer
+- Araçları açılarına göre döndürerek çizer
+- Trafik ışıklarını ve geri sayım göstergelerini gösterir
+- Kontrol paneli ve bilgi göstergelerini yönetir
+
+### Controller Katmanı
+
+`TrafficController` sınıfı:
+- Kullanıcı buton tıklamalarını işler
+- AnimationTimer ile oyun döngüsünü yönetir
+- Model ve View arasındaki iletişimi sağlar
+
+---
+
+## 🔧 Teknik Detaylar
+
+### Yeşil Işık Süresi Hesaplama
+
+```
+Yeşil Süre = (Yön Araç Sayısı / Toplam Araç Sayısı) × Kullanılabilir Süre
+
+Kullanılabilir Süre = 120sn - (4 × 3sn sarı ışık) = 108sn
+```
+
+**Sınırlamalar:**
+- Minimum yeşil ışık: 10 saniye
+- Maksimum yeşil ışık: 60 saniye
+- Toplam döngü süresi: 120 saniye (sabit)
+- Sarı ışık süresi: 3 saniye
+
+### Kavisli Dönüş Sistemi
+
+Araçlar, kavşakta **Quadratic Bezier eğrisi** kullanarak yumuşak dönüşler yapar:
+
+```
+B(t) = (1-t)²P₀ + 2(1-t)tP₁ + t²P₂
+
+P₀: Dönüş başlangıç noktası
+P₁: Kontrol noktası (dönüş yarıçapını belirler)
+P₂: Dönüş bitiş noktası
+```
+
+Araç açısı, eğrinin teğetine göre dinamik olarak hesaplanır.
+
+### Dönüş Oranları
+
+| Dönüş Tipi | Oran |
+|------------|------|
+| Düz | %50 |
+| Sola | %25 |
+| Sağa | %25 |
+
+---
+
+## 🚀 Kurulum ve Çalıştırma
+
+### Gereksinimler
+
+- **Java 21** veya üzeri
+- **Maven** (veya wrapper kullanılabilir)
+
+### Derleme
+
+```bash
+./mvnw clean compile
+```
+
+### Çalıştırma
+
+```bash
+./mvnw javafx:run
+```
+
+---
+
+## 🎮 Kullanım
+
+1. **Araç Sayısı Girişi**: Her yön için araç sayısını manuel girin veya **"🎲 Rastgele Oluştur"** butonuna tıklayın
+
+2. **Simülasyonu Başlatın**: **"▶ Başlat"** butonuna tıklayarak simülasyonu başlatın
+
+3. **Kontrol Butonları**:
+   - **▶ Başlat**: Simülasyonu başlatır
+   - **⏸ Durdur**: Simülasyonu duraklatır
+   - **🔄 Sıfırla**: Simülasyonu sıfırlar
+
+4. **Bilgi Paneli**: Sol panelde yeşil ışık süreleri, aktif yön, geçen araç sayısı ve kalan araç sayısı gösterilir
+
+---
+
+## 📐 Tasarım Kararları
+
+### Şerit Pozisyonları
+
+| Yön | Şerit Merkezi |
+|-----|---------------|
+| Kuzey (Yukarı) | x = 375 |
+| Güney (Aşağı) | x = 425 |
+| Doğu (Sol) | y = 375 |
+| Batı (Sağ) | y = 425 |
+
+### Araç Özellikleri
+
+- **Boyut**: 25 × 45 piksel
+- **Güvenli Mesafe**: 55 piksel
+- **Hız**: 80-120 piksel/saniye (rastgele)
+- **Dönüşte Hız**: Sağa dönüş %80, sola dönüş %60
+
+---
+
+## 📝 Lisans
+
+Bu proje eğitim amaçlı geliştirilmiştir.
+
+---
+
+## 👨‍💻 Geliştirici Notları
+
+- Sadece **standart Java SE** kütüphaneleri ve **JavaFX** kullanılmıştır
+- 3. parti kütüphane kullanılmamıştır
+- **Java Collection Framework** (List, Map, EnumMap) etkin şekilde kullanılmıştır
+- Kod modüler, okunabilir ve MVC yapısına uygun olarak ayrıştırılmıştır
 - **TrafficController**: Class managing user interactions and simulation flow
 
 ## How to Run

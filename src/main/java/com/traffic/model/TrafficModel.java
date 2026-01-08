@@ -127,30 +127,34 @@ public class TrafficModel {
         int westCount = vehicleCounts.get(Direction.WEST);
 
         // Kuzeyden gelen araçlar (aşağıdan yukarı hareket)
+        // Şerit merkezi: Car.LANE_NORTH_X
         for (int i = 0; i < northCount; i++) {
-            double x = 387; // Sol şerit
+            double x = Car.LANE_NORTH_X - Car.CAR_WIDTH / 2.0;
             double y = -60 - (i * Car.SAFE_DISTANCE);
             cars.add(new Car(Direction.NORTH, x, y));
         }
 
         // Güneyden gelen araçlar (yukarıdan aşağı hareket)
+        // Şerit merkezi: Car.LANE_SOUTH_X
         for (int i = 0; i < southCount; i++) {
-            double x = 412; // Sağ şerit
+            double x = Car.LANE_SOUTH_X - Car.CAR_WIDTH / 2.0;
             double y = 860 + (i * Car.SAFE_DISTANCE);
             cars.add(new Car(Direction.SOUTH, x, y));
         }
 
         // Doğudan gelen araçlar (sağdan sola hareket)
+        // Şerit merkezi: Car.LANE_EAST_Y
         for (int i = 0; i < eastCount; i++) {
             double x = 860 + (i * Car.SAFE_DISTANCE);
-            double y = 387; // Üst şerit
+            double y = Car.LANE_EAST_Y - Car.CAR_WIDTH / 2.0;
             cars.add(new Car(Direction.EAST, x, y));
         }
 
         // Batıdan gelen araçlar (soldan sağa hareket)
+        // Şerit merkezi: Car.LANE_WEST_Y
         for (int i = 0; i < westCount; i++) {
             double x = -60 - (i * Car.SAFE_DISTANCE);
-            double y = 412; // Alt şerit
+            double y = Car.LANE_WEST_Y - Car.CAR_WIDTH / 2.0;
             cars.add(new Car(Direction.WEST, x, y));
         }
     }
@@ -266,7 +270,7 @@ public class TrafficModel {
     }
 
     /**
-     * Araçları günceller - hareket ve çarpışma önleme.
+     * Araçları günceller - hareket, çarpışma önleme ve kavşak güvenliği.
      */
     private void updateCars(double deltaTime) {
         // Araçları mevcut yöne göre grupla (dönüş yapmış olanlar yeni yönlerinde)
@@ -288,46 +292,108 @@ public class TrafficModel {
             // Araçları sırala (kavşağa en yakın önde)
             sortCarsByPosition(dirCars, dir);
 
-            // Origin direction'a göre ışık kontrolü yap
             for (int i = 0; i < dirCars.size(); i++) {
                 Car car = dirCars.get(i);
-                boolean canMove = true;
 
-                // Işık kontrolü için orijinal yönü kullan (henüz dönmemiş araçlar için)
+                // Işık kontrolü için orijinal yönü kullan
                 TrafficLight light = trafficLights.get(car.getOriginDirection());
 
-                // 1. Öndeki araca çarpma kontrolü
+                // === ÇARPIŞMA ÖNLEME ===
+                double speedFactor = 1.0; // 1.0 = tam hız, 0.0 = dur
+
+                // 1. Öndeki araca olan mesafeyi kontrol et
                 if (i > 0) {
                     Car carAhead = dirCars.get(i - 1);
                     double distance = car.getDistanceToCarAhead(carAhead);
-                    if (distance < Car.SAFE_DISTANCE - Car.CAR_LENGTH) {
-                        canMove = false;
+
+                    // Güvenli takip mesafesi hesapla
+                    double safeDistance = Car.SAFE_DISTANCE;
+                    double criticalDistance = Car.CAR_LENGTH + 5; // Minimum mesafe
+
+                    if (distance < criticalDistance) {
+                        // Çok yakın - tamamen dur
+                        speedFactor = 0.0;
+                    } else if (distance < safeDistance) {
+                        // Yaklaşıyor - kademeli yavaşla
+                        speedFactor = (distance - criticalDistance) / (safeDistance - criticalDistance);
+                        speedFactor = Math.max(0.1, speedFactor); // En az %10 hız
                     }
                 }
 
-                // 2. Durak çizgisi ve ışık kontrolü (sadece henüz kavşağı geçmemiş araçlar için)
-                if (canMove && !car.isPastStopLine() && !car.hasTurned()) {
+                // === KAVŞAK GÜVENLİĞİ ===
+                // Kavşak içindeki veya dönüş yapan araçlar ASLA durmamalı
+                boolean isInIntersectionArea = car.isInIntersection() || car.isTurning() || car.hasTurned();
+                boolean hasCrossedStopLine = car.isPastStopLine();
+
+                // === IŞIK KONTROLÜ ===
+                // Sadece kavşağa GİRMEMİŞ araçlar ışığa uyar
+                if (!isInIntersectionArea && !hasCrossedStopLine) {
                     double distToStop = car.getDistanceToStopLine();
 
-                    // Dur çizgisine yaklaşıyorsa ve ışık yeşil değilse dur
-                    if (distToStop > 0 && distToStop < 30) {
+                    // Durak çizgisine yaklaşıyorsa
+                    if (distToStop > 0 && distToStop < 50) {
                         if (!light.allowsPass()) {
-                            canMove = false;
+                            // Işık kırmızı veya sarı - yavaşla ve dur
+                            double stopFactor = distToStop / 50.0;
+                            speedFactor = Math.min(speedFactor, stopFactor);
+
+                            // Çizgiye çok yakınsa tamamen dur
+                            if (distToStop < 10) {
+                                speedFactor = 0.0;
+                            }
                         }
                     }
                 }
 
-                // 3. Hareket veya dur
-                if (canMove) {
-                    car.accelerate();
-                    car.move(deltaTime);
-                } else {
+                // === HAREKET UYGULA ===
+                if (speedFactor <= 0.01) {
                     car.stop();
+                } else {
+                    car.setSpeedFactor(speedFactor);
+                    car.move(deltaTime);
                 }
 
-                // 4. Geçen araçları say
+                // === GEÇİŞ SAYACI ===
                 if (car.hasPassed()) {
                     totalCarsPassed++;
+                }
+            }
+        }
+
+        // Farklı yönlerden gelen araçlar arasında kavşak içi çarpışma kontrolü
+        checkIntersectionCollisions(carsByDirection);
+    }
+
+    /**
+     * Kavşak içinde farklı yönlerden gelen araçlar arasındaki çarpışmaları kontrol eder.
+     */
+    private void checkIntersectionCollisions(Map<Direction, List<Car>> carsByDirection) {
+        List<Car> carsInIntersection = new ArrayList<>();
+
+        // Kavşak içindeki tüm araçları bul
+        for (List<Car> dirCars : carsByDirection.values()) {
+            for (Car car : dirCars) {
+                if (car.isInIntersection() || car.isTurning()) {
+                    carsInIntersection.add(car);
+                }
+            }
+        }
+
+        // Kavşak içindeki araçlar arasında mesafe kontrolü
+        for (int i = 0; i < carsInIntersection.size(); i++) {
+            Car car1 = carsInIntersection.get(i);
+            for (int j = i + 1; j < carsInIntersection.size(); j++) {
+                Car car2 = carsInIntersection.get(j);
+
+                // Aynı yönde değillerse çarpışma kontrolü yap
+                if (car1.getDirection() != car2.getDirection()) {
+                    double distance = car1.getDistanceTo(car2);
+                    if (distance < Car.CAR_LENGTH * 1.5) {
+                        // Çok yakınlar - daha yeni giren yavaşlasın
+                        // (Basit çözüm: ikisi de biraz yavaşlasın)
+                        car1.slowDown(0.5);
+                        car2.slowDown(0.5);
+                    }
                 }
             }
         }
