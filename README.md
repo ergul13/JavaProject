@@ -1,195 +1,144 @@
-# Traffic Light Control System Based on Vehicle Density
+# Trafik Isigi Kontrol Sistemi - Arac Yogunluguna Dayali
 
-## Project Overview
-A smart traffic light simulation system for a 4-way intersection (North, South, East, West) that adjusts green light durations based on vehicle density.
+## Proje Ozeti
 
-**Tech Stack:** Java SE 21, JavaFX, MVC Design Pattern  
-**Developer:** Senior Java Developer  
-**Constraints:** NO third-party libraries, Strict MVC architecture
+Bu proje, dort yonlu bir kavsak icin arac yogunluguna gore dinamik olarak calisan bir trafik isigi simülasyonu sunmaktadir. JavaFX kullanilarak gelistirilmis olup, MVC (Model-View-Controller) mimarisine siki sikiya baglidir.
 
-## Architecture
+## Mimari Yapi
 
-### Model-View-Controller (MVC) Pattern
+Proje uc ana katmandan olusmaktadir:
 
-#### Model Layer (`model` package)
-- **Direction.java** - Enum representing the four directions (NORTH, SOUTH, EAST, WEST)
-- **LightColor.java** - Enum for traffic light colors (RED, YELLOW, GREEN)
-- **Vehicle.java** - Represents a vehicle waiting at the intersection
-- **TrafficLight.java** - Represents a traffic light for one direction
-- **IntersectionManager.java** - Core logic managing the intersection, vehicles, and timing calculations
+### Model Katmani
+- **Direction**: Dort yonu temsil eden enum (NORTH, SOUTH, EAST, WEST)
+- **LightColor**: Isik renklerini temsil eden enum (RED, YELLOW, GREEN)
+- **SignalPhase**: Sinyal fazlarini temsil eden enum
+- **TrafficLight**: Trafik isiginin durumunu ve kalan suresini tutan sinif
+- **Vehicle**: Araclarin konumunu ve durumunu tutan sinif
+- **TrafficState**: Tum simülasyon durumunu yoneten sinif
+- **TimingCalculator**: Yesil isik surelerini hesaplayan sinif
 
-#### View Layer (`view` package)
-- **TrafficSimulationView.java** - JavaFX-based GUI with:
-  - 4-way intersection visualization
-  - Vehicle density input fields
-  - Control buttons (Start, Pause, Reset, Random)
-  - Digital countdown timers
-  - Animated vehicle movement
+### View Katmani
+- **TrafficSimulationView**: Tum gorsel bilesenleri iceren JavaFX arayuzu
 
-#### Controller Layer (`controller` package)
-- **TrafficController.java** - Bridges Model and View, handles events and updates
+### Controller Katmani
+- **TrafficController**: Kullanici etkilesimlerini ve simülasyon akisini yoneten sinif
 
-## Features
+## Nasil Calistirilir
 
-### 1. Smart Green Light Allocation
-- **Total Cycle Time:** 120 seconds (fixed)
-- **Yellow Light Duration:** 3 seconds (constant)
-- **Green Light Duration:** Proportional to vehicle density
-  - Minimum: 10 seconds
-  - Maximum: 60 seconds
-  - Algorithm: Calculates percentage of total traffic per lane
+### Gereksinimler
+- Java 21 veya ustu
+- Maven
 
-### 2. GUI Components
-- **Central Visualization:** Graphical 4-way intersection with roads, lanes, and stop lines
-- **Input Panel:** 
-  - Manual vehicle count input (0-50 per direction)
-  - "Generate Random Density" button
-- **Control Panel:**
-  - Start Simulation
-  - Pause/Resume
-  - Reset
-- **Live Display:**
-  - Digital countdown timers for each direction
-  - Color-coded timer based on current light (Red/Yellow/Green)
-  - Status indicator showing elapsed time and active direction
+### Calistirma Adimlari
 
-### 3. Vehicle Animation
-- Cars appear in queue at each direction based on density
-- Cars move during green light
-- Cars disappear after crossing the intersection
-- No collision detection - cars maintain safe distance
-- Smooth animation at 1 second intervals
-
-### 4. Traffic Logic Rules
-1. Cycle processes initial vehicle set (no new cars during cycle)
-2. Direction order: North → East → South → West
-3. Each direction gets: Green → Yellow → Red
-4. Next direction activates after yellow completes
-5. Cycle ends when all directions complete their phases
-
-## Algorithm: Green Light Duration Calculation
-
+1. Projeyi derleyin:
 ```
-1. Calculate total vehicles across all directions
-2. Available green time = 120s - (4 directions × 3s yellow) = 108s
-3. For each direction:
-   - Calculate proportion = vehicles_in_direction / total_vehicles
-   - Initial green time = proportion × available_green_time
-   - Apply constraints: MIN(10s, MAX(60s, green_time))
-4. Adjust if total doesn't match available time:
-   - Distribute difference to directions with most vehicles
-   - Respect min/max constraints
-```
-
-## How to Run
-
-### Prerequisites
-- Java 21 or higher
-- Maven 3.x
-- JavaFX 21
-
-### Build and Run
-```bash
-# Clean and compile
 ./mvnw clean compile
+```
 
-# Run application
+2. Uygulamayi baslatin:
+```
 ./mvnw javafx:run
 ```
 
-### Using the Application
-1. **Set Vehicle Density:**
-   - Enter vehicle counts (0-50) for each direction, OR
-   - Click "Generate Random Density" for automatic values
+### Kullanim
 
-2. **Start Simulation:**
-   - Click "Start Simulation"
-   - Watch the traffic lights cycle through colors
-   - Observe vehicles moving during green lights
-   - Monitor countdown timers
+1. Her yon icin arac sayisini manuel olarak girin veya "Random" butonuna tiklayarak rastgele degerler uretin
+2. "Start" butonuna tiklayarak simülasyonu baslatin
+3. "Pause" butonu ile simülasyonu durdurup devam ettirebilirsiniz
+4. "Reset" butonu ile simülasyonu sifirlayin
 
-3. **Control Simulation:**
-   - **Pause:** Pause the running simulation
-   - **Resume:** Continue from paused state
-   - **Reset:** Clear all data and start fresh
+## Temel Tasarim Kararlari
 
-## Project Structure
+### Zamanlama Hesaplamasi
+- Toplam cevrim suresi: 120 saniye (sabit)
+- Sari isik suresi: 3 saniye (sabit)
+- Yesil isik suresi: Arac yogunluguna orantili olarak hesaplanir
+- Minimum yesil sure: 10 saniye
+- Maksimum yesil sure: 60 saniye
+
+### Hesaplama Formulu
+1. Toplam sari suresi = 4 yon x 3 saniye = 12 saniye
+2. Kullanilabilir yesil sure = 120 - 12 = 108 saniye
+3. Her yon icin yesil sure = (yondeki arac / toplam arac) x 108 saniye
+4. Sonuc 10-60 saniye araligina sinirlandirilir
+
+### Arac Davranisi
+- Araclar kirmizi isikta durur
+- Yesil isikta hareket eder
+- Kavsagi gectikten sonra sahneden silinir
+- Araclar birbirine carpmaz
+
+---
+
+# Traffic Light Control System - Based on Vehicle Density
+
+## Project Summary
+
+This project provides a traffic light simulation for a four-way intersection that dynamically operates based on vehicle density. Developed using JavaFX, it strictly adheres to the MVC (Model-View-Controller) architecture.
+
+## Architecture
+
+The project consists of three main layers:
+
+### Model Layer
+- **Direction**: Enum representing four directions (NORTH, SOUTH, EAST, WEST)
+- **LightColor**: Enum representing light colors (RED, YELLOW, GREEN)
+- **SignalPhase**: Enum representing signal phases
+- **TrafficLight**: Class holding traffic light state and remaining time
+- **Vehicle**: Class holding vehicle position and state
+- **TrafficState**: Class managing the entire simulation state
+- **TimingCalculator**: Class calculating green light durations
+
+### View Layer
+- **TrafficSimulationView**: JavaFX interface containing all visual components
+
+### Controller Layer
+- **TrafficController**: Class managing user interactions and simulation flow
+
+## How to Run
+
+### Requirements
+- Java 21 or higher
+- Maven
+
+### Running Steps
+
+1. Compile the project:
 ```
-JavaProject/
-├── src/main/java/
-│   ├── model/
-│   │   ├── Direction.java
-│   │   ├── LightColor.java
-│   │   ├── Vehicle.java
-│   │   ├── TrafficLight.java
-│   │   └── IntersectionManager.java
-│   ├── view/
-│   │   └── TrafficSimulationView.java
-│   ├── controller/
-│   │   └── TrafficController.java
-│   ├── odev/odev/
-│   │   └── Main.java
-│   └── module-info.java
-├── pom.xml
-└── README.md
+./mvnw clean compile
 ```
+
+2. Start the application:
+```
+./mvnw javafx:run
+```
+
+### Usage
+
+1. Enter vehicle counts manually for each direction or click "Random" button to generate random values
+2. Click "Start" button to begin the simulation
+3. Use "Pause" button to pause and resume the simulation
+4. Use "Reset" button to reset the simulation
 
 ## Key Design Decisions
 
-### 1. Strict MVC Separation
-- **Model** contains all business logic, no GUI dependencies
-- **View** handles all UI rendering, no business logic
-- **Controller** acts as mediator, coordinates Model and View
+### Timing Calculation
+- Total cycle time: 120 seconds (fixed)
+- Yellow light duration: 3 seconds (fixed)
+- Green light duration: Calculated proportionally to vehicle density
+- Minimum green time: 10 seconds
+- Maximum green time: 60 seconds
 
-### 2. Standard Java Collections
-- `EnumMap` for direction-based storage (optimal for enums)
-- `ArrayList` for vehicle lists
-- `LinkedList` for direction queue (FIFO)
+### Calculation Formula
+1. Total yellow time = 4 directions x 3 seconds = 12 seconds
+2. Available green time = 120 - 12 = 108 seconds
+3. Green time per direction = (vehicles in direction / total vehicles) x 108 seconds
+4. Result is clamped to 10-60 seconds range
 
-### 3. JavaFX Canvas for Animation
-- Direct graphics rendering using GraphicsContext
-- Efficient for real-time vehicle movement
-- Full control over visual representation
-
-### 4. Proportional Allocation Algorithm
-- Fair distribution based on traffic load
-- Respects safety constraints (min/max times)
-- Handles edge cases (zero vehicles, unequal distribution)
-
-### 5. Time Management
-- `Timeline` with 1-second intervals
-- Countdown timers for user feedback
-- State machine for light transitions
-
-## Future Enhancements (Not Implemented)
-- Emergency vehicle priority
-- Pedestrian crossings
-- Multiple intersections
-- Historical traffic data analysis
-- Optimization using machine learning
-
-## Testing Scenarios
-
-### Scenario 1: Equal Distribution
-- Input: 10 vehicles per direction
-- Expected: Each direction gets ~27s green time (108s / 4)
-
-### Scenario 2: Unequal Distribution
-- Input: North=20, South=10, East=5, West=5
-- Expected: North gets more green time proportionally
-
-### Scenario 3: Edge Case - Zero Vehicles
-- Input: 0 vehicles in one or more directions
-- Expected: Minimum 10s green time still allocated
-
-### Scenario 4: Maximum Constraint
-- Input: North=50, others=1
-- Expected: North gets 60s (max), others get minimum time
-
-## License
-Educational project - Free to use and modify
-
-## Author
-Senior Java Developer
-Version 1.0 - January 2026
+### Vehicle Behavior
+- Vehicles stop at red light
+- Vehicles move at green light
+- Vehicles are removed from scene after crossing the intersection
+- Vehicles never collide with each other
 
