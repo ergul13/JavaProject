@@ -56,95 +56,109 @@ public class TrafficView extends BorderPane {
      * Sol kontrol panelini oluşturur.
      */
     private VBox createControlPanel() {
-        VBox panel = new VBox(10);
-        panel.setPadding(new Insets(15));
-        panel.setStyle("-fx-background-color: #f5f5f5; -fx-border-color: #cccccc; -fx-border-width: 0 2 0 0;");
-        panel.setPrefWidth(220);
+        VBox panel = new VBox(12);
+        panel.setPadding(new Insets(20));
+        panel.setStyle("-fx-background-color: linear-gradient(to bottom, #2c3e50, #34495e); " +
+                       "-fx-border-color: #1a252f; -fx-border-width: 0 3 0 0;");
+        panel.setPrefWidth(260);
 
         // Başlık
         Label titleLabel = new Label("🚦 Trafik Kontrol Sistemi");
-        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-        titleLabel.setStyle("-fx-text-fill: #333;");
+        titleLabel.setFont(Font.font("System", FontWeight.BOLD, 16));
+        titleLabel.setStyle("-fx-text-fill: #ecf0f1;");
+        titleLabel.setWrapText(true);
 
         // Ayırıcı
-        Separator sep1 = new Separator();
+        Separator sep1 = createStyledSeparator();
 
         // Araç Yoğunluğu Girişi
-        Label inputTitle = new Label("Araç Yoğunluğu:");
-        inputTitle.setFont(Font.font("System", FontWeight.BOLD, 12));
+        Label inputTitle = new Label("📊 Araç Yoğunluğu");
+        inputTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
+        inputTitle.setStyle("-fx-text-fill: #3498db;");
 
-        tfNorth = createTextField("10");
-        tfSouth = createTextField("10");
-        tfEast = createTextField("10");
-        tfWest = createTextField("10");
+        tfNorth = createStyledTextField("10");
+        tfSouth = createStyledTextField("10");
+        tfEast = createStyledTextField("10");
+        tfWest = createStyledTextField("10");
 
         GridPane inputGrid = new GridPane();
-        inputGrid.setHgap(10);
-        inputGrid.setVgap(5);
-        inputGrid.add(new Label("Kuzey:"), 0, 0);
+        inputGrid.setHgap(12);
+        inputGrid.setVgap(8);
+        inputGrid.setStyle("-fx-padding: 10;");
+
+        Label lblNorth = createDirectionLabel("⬆ Kuzey:");
+        Label lblSouth = createDirectionLabel("⬇ Güney:");
+        Label lblEast = createDirectionLabel("➡ Doğu:");
+        Label lblWest = createDirectionLabel("⬅ Batı:");
+
+        inputGrid.add(lblNorth, 0, 0);
         inputGrid.add(tfNorth, 1, 0);
-        inputGrid.add(new Label("Güney:"), 0, 1);
+        inputGrid.add(lblSouth, 0, 1);
         inputGrid.add(tfSouth, 1, 1);
-        inputGrid.add(new Label("Doğu:"), 0, 2);
+        inputGrid.add(lblEast, 0, 2);
         inputGrid.add(tfEast, 1, 2);
-        inputGrid.add(new Label("Batı:"), 0, 3);
+        inputGrid.add(lblWest, 0, 3);
         inputGrid.add(tfWest, 1, 3);
 
         // Rastgele butonu
-        btnRandom = new Button("🎲 Rastgele Oluştur");
+        btnRandom = createStyledButton("🎲 Rastgele Oluştur", "#9b59b6", "#8e44ad");
         btnRandom.setMaxWidth(Double.MAX_VALUE);
-        btnRandom.setStyle("-fx-background-color: #9b59b6; -fx-text-fill: white;");
 
         // Ayırıcı
-        Separator sep2 = new Separator();
+        Separator sep2 = createStyledSeparator();
 
         // Kontrol butonları
-        Label controlTitle = new Label("Simülasyon Kontrolleri:");
-        controlTitle.setFont(Font.font("System", FontWeight.BOLD, 12));
+        Label controlTitle = new Label("🎮 Simülasyon Kontrolleri");
+        controlTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
+        controlTitle.setStyle("-fx-text-fill: #3498db;");
 
-        btnStart = new Button("▶ Başlat");
-        btnPause = new Button("⏸ Durdur");
-        btnReset = new Button("🔄 Sıfırla");
+        btnStart = createStyledButton("▶ Başlat", "#27ae60", "#1e8449");
+        btnPause = createStyledButton("⏸ Durdur", "#f39c12", "#d68910");
+        btnReset = createStyledButton("🔄 Sıfırla", "#e74c3c", "#c0392b");
 
-        btnStart.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white;");
-        btnPause.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white;");
-        btnReset.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white;");
-
+        btnStart.setPrefWidth(70);
+        btnPause.setPrefWidth(70);
+        btnReset.setPrefWidth(70);
         btnPause.setDisable(true);
 
-        HBox buttonBox = new HBox(5, btnStart, btnPause, btnReset);
+        HBox buttonBox = new HBox(8, btnStart, btnPause, btnReset);
         buttonBox.setAlignment(Pos.CENTER);
 
         // Ayırıcı
-        Separator sep3 = new Separator();
+        Separator sep3 = createStyledSeparator();
 
         // Bilgi paneli
-        Label infoTitle = new Label("Yeşil Işık Süreleri:");
-        infoTitle.setFont(Font.font("System", FontWeight.BOLD, 12));
+        Label infoTitle = new Label("⏱ Yeşil Işık Süreleri");
+        infoTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
+        infoTitle.setStyle("-fx-text-fill: #2ecc71;");
 
-        lblNorthInfo = createInfoLabel("Kuzey: --");
-        lblSouthInfo = createInfoLabel("Güney: --");
-        lblEastInfo = createInfoLabel("Doğu: --");
-        lblWestInfo = createInfoLabel("Batı: --");
+        lblNorthInfo = createStyledInfoLabel("⬆ Kuzey: --");
+        lblSouthInfo = createStyledInfoLabel("⬇ Güney: --");
+        lblEastInfo = createStyledInfoLabel("➡ Doğu:  --");
+        lblWestInfo = createStyledInfoLabel("⬅ Batı:  --");
 
-        VBox greenTimesBox = new VBox(3, lblNorthInfo, lblSouthInfo, lblEastInfo, lblWestInfo);
-        greenTimesBox.setStyle("-fx-background-color: #ecf0f1; -fx-padding: 8; -fx-background-radius: 5;");
+        VBox greenTimesBox = new VBox(6, lblNorthInfo, lblSouthInfo, lblEastInfo, lblWestInfo);
+        greenTimesBox.setStyle("-fx-background-color: rgba(46, 204, 113, 0.1); " +
+                              "-fx-padding: 12; -fx-background-radius: 8; " +
+                              "-fx-border-color: #27ae60; -fx-border-radius: 8; -fx-border-width: 1;");
 
         // Durum bilgisi
-        Separator sep4 = new Separator();
+        Separator sep4 = createStyledSeparator();
 
-        Label statusTitle = new Label("Simülasyon Durumu:");
-        statusTitle.setFont(Font.font("System", FontWeight.BOLD, 12));
+        Label statusTitle = new Label("📈 Simülasyon Durumu");
+        statusTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
+        statusTitle.setStyle("-fx-text-fill: #e67e22;");
 
-        lblCurrentPhase = createInfoLabel("Aktif Yön: --");
-        lblTotalTime = createInfoLabel("Toplam Süre: 0.0s");
-        lblCarsPassed = createInfoLabel("Geçen Araç: 0");
-        lblRemainingCars = createInfoLabel("Kalan Araç: 0");
-        lblStatus = createInfoLabel("Durum: Bekliyor");
-        lblStatus.setStyle("-fx-font-weight: bold;");
+        lblCurrentPhase = createStyledInfoLabel("🚦 Aktif Yön: --");
+        lblTotalTime = createStyledInfoLabel("⏰ Süre: 0.0s");
+        lblCarsPassed = createStyledInfoLabel("✅ Geçen: 0 araç");
+        lblRemainingCars = createStyledInfoLabel("🚗 Kalan: 0 araç");
+        lblStatus = createStyledInfoLabel("📍 Durum: Bekliyor");
 
-        VBox statusBox = new VBox(3, lblCurrentPhase, lblTotalTime, lblCarsPassed, lblRemainingCars, lblStatus);
-        statusBox.setStyle("-fx-background-color: #ecf0f1; -fx-padding: 8; -fx-background-radius: 5;");
+        VBox statusBox = new VBox(6, lblCurrentPhase, lblTotalTime, lblCarsPassed, lblRemainingCars, lblStatus);
+        statusBox.setStyle("-fx-background-color: rgba(230, 126, 34, 0.1); " +
+                          "-fx-padding: 12; -fx-background-radius: 8; " +
+                          "-fx-border-color: #e67e22; -fx-border-radius: 8; -fx-border-width: 1;");
 
         // Tümünü panele ekle
         panel.getChildren().addAll(
@@ -159,23 +173,67 @@ public class TrafficView extends BorderPane {
     }
 
     /**
-     * Standart text field oluşturur.
+     * Stillendirilmiş ayırıcı oluşturur.
      */
-    private TextField createTextField(String defaultValue) {
+    private Separator createStyledSeparator() {
+        Separator sep = new Separator();
+        sep.setStyle("-fx-background-color: #465c6e;");
+        return sep;
+    }
+
+    /**
+     * Yön etiketi oluşturur.
+     */
+    private Label createDirectionLabel(String text) {
+        Label label = new Label(text);
+        label.setFont(Font.font("System", FontWeight.BOLD, 12));
+        label.setStyle("-fx-text-fill: #bdc3c7;");
+        return label;
+    }
+
+    /**
+     * Stillendirilmiş text field oluşturur.
+     */
+    private TextField createStyledTextField(String defaultValue) {
         TextField tf = new TextField(defaultValue);
-        tf.setPrefWidth(80);
-        tf.setStyle("-fx-background-color: white; -fx-border-color: #bdc3c7; -fx-border-radius: 3;");
+        tf.setPrefWidth(90);
+        tf.setStyle("-fx-background-color: #ecf0f1; " +
+                   "-fx-border-color: #3498db; -fx-border-radius: 5; " +
+                   "-fx-background-radius: 5; -fx-font-size: 13; " +
+                   "-fx-font-weight: bold; -fx-alignment: center;");
         return tf;
     }
 
     /**
-     * Bilgi etiketi oluşturur.
+     * Stillendirilmiş buton oluşturur.
      */
-    private Label createInfoLabel(String text) {
+    private Button createStyledButton(String text, String bgColor, String hoverColor) {
+        Button btn = new Button(text);
+        btn.setStyle("-fx-background-color: " + bgColor + "; " +
+                    "-fx-text-fill: white; -fx-font-weight: bold; " +
+                    "-fx-background-radius: 8; -fx-cursor: hand; " +
+                    "-fx-font-size: 12;");
+        btn.setOnMouseEntered(e -> btn.setStyle("-fx-background-color: " + hoverColor + "; " +
+                    "-fx-text-fill: white; -fx-font-weight: bold; " +
+                    "-fx-background-radius: 8; -fx-cursor: hand; " +
+                    "-fx-font-size: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 5, 0, 0, 2);"));
+        btn.setOnMouseExited(e -> btn.setStyle("-fx-background-color: " + bgColor + "; " +
+                    "-fx-text-fill: white; -fx-font-weight: bold; " +
+                    "-fx-background-radius: 8; -fx-cursor: hand; " +
+                    "-fx-font-size: 12;"));
+        return btn;
+    }
+
+    /**
+     * Stillendirilmiş bilgi etiketi oluşturur.
+     */
+    private Label createStyledInfoLabel(String text) {
         Label label = new Label(text);
-        label.setFont(Font.font("Monospaced", 11));
+        label.setFont(Font.font("Monospaced", FontWeight.NORMAL, 12));
+        label.setStyle("-fx-text-fill: #ecf0f1;");
         return label;
     }
+
 
     /**
      * Ana çizim metodu - model durumuna göre tüm görsel öğeleri günceller.
@@ -365,16 +423,18 @@ public class TrafficView extends BorderPane {
             gc.setStroke(Color.BLACK);
             gc.setLineWidth(1);
 
-            switch (car.getDirection()) {
+            Direction currentDir = car.getDirection();
+
+            switch (currentDir) {
                 case NORTH:
                 case SOUTH:
                     // Dikey araç
-                    drawVerticalCar(gc, x, y, car.getDirection() == Direction.NORTH);
+                    drawVerticalCar(gc, x, y, currentDir == Direction.NORTH, car.getTurnDirection());
                     break;
                 case EAST:
                 case WEST:
                     // Yatay araç
-                    drawHorizontalCar(gc, x, y, car.getDirection() == Direction.WEST);
+                    drawHorizontalCar(gc, x, y, currentDir == Direction.WEST, car.getTurnDirection());
                     break;
             }
         }
@@ -383,7 +443,7 @@ public class TrafficView extends BorderPane {
     /**
      * Dikey araç çizer.
      */
-    private void drawVerticalCar(GraphicsContext gc, double x, double y, boolean facingUp) {
+    private void drawVerticalCar(GraphicsContext gc, double x, double y, boolean facingUp, TurnDirection turn) {
         int w = Car.CAR_WIDTH;
         int h = Car.CAR_LENGTH;
 
@@ -410,12 +470,15 @@ public class TrafficView extends BorderPane {
             gc.fillOval(x + 3, y, 5, 5);
             gc.fillOval(x + w - 8, y, 5, 5);
         }
+
+        // Dönüş yönü göstergesi (sinyal lambası)
+        drawTurnIndicator(gc, x, y, w, h, turn, true, facingUp);
     }
 
     /**
      * Yatay araç çizer.
      */
-    private void drawHorizontalCar(GraphicsContext gc, double x, double y, boolean facingRight) {
+    private void drawHorizontalCar(GraphicsContext gc, double x, double y, boolean facingRight, TurnDirection turn) {
         int w = Car.CAR_LENGTH;
         int h = Car.CAR_WIDTH;
 
@@ -442,6 +505,51 @@ public class TrafficView extends BorderPane {
             gc.fillOval(x, y + 3, 5, 5);
             gc.fillOval(x, y + h - 8, 5, 5);
         }
+
+        // Dönüş yönü göstergesi
+        drawTurnIndicator(gc, x, y, w, h, turn, false, facingRight);
+    }
+
+    /**
+     * Dönüş sinyali göstergesi çizer.
+     */
+    private void drawTurnIndicator(GraphicsContext gc, double x, double y, int w, int h,
+                                   TurnDirection turn, boolean isVertical, boolean facingPositive) {
+        if (turn == TurnDirection.STRAIGHT) return;
+
+        gc.setFill(Color.ORANGE);
+
+        if (isVertical) {
+            // Dikey araç
+            if (facingPositive) { // Yukarı gidiyor
+                if (turn == TurnDirection.LEFT) {
+                    gc.fillOval(x - 2, y + h - 10, 4, 4);
+                } else {
+                    gc.fillOval(x + w - 2, y + h - 10, 4, 4);
+                }
+            } else { // Aşağı gidiyor
+                if (turn == TurnDirection.LEFT) {
+                    gc.fillOval(x + w - 2, y + 6, 4, 4);
+                } else {
+                    gc.fillOval(x - 2, y + 6, 4, 4);
+                }
+            }
+        } else {
+            // Yatay araç
+            if (facingPositive) { // Sağa gidiyor
+                if (turn == TurnDirection.LEFT) {
+                    gc.fillOval(x + w - 10, y - 2, 4, 4);
+                } else {
+                    gc.fillOval(x + w - 10, y + h - 2, 4, 4);
+                }
+            } else { // Sola gidiyor
+                if (turn == TurnDirection.LEFT) {
+                    gc.fillOval(x + 6, y + h - 2, 4, 4);
+                } else {
+                    gc.fillOval(x + 6, y - 2, 4, 4);
+                }
+            }
+        }
     }
 
     /**
@@ -449,33 +557,33 @@ public class TrafficView extends BorderPane {
      */
     private void updateInfoPanel(TrafficModel model) {
         // Yeşil ışık süreleri
-        lblNorthInfo.setText(String.format("Kuzey: %.1f sn", model.getGreenDuration(Direction.NORTH)));
-        lblSouthInfo.setText(String.format("Güney: %.1f sn", model.getGreenDuration(Direction.SOUTH)));
-        lblEastInfo.setText(String.format("Doğu:  %.1f sn", model.getGreenDuration(Direction.EAST)));
-        lblWestInfo.setText(String.format("Batı:  %.1f sn", model.getGreenDuration(Direction.WEST)));
+        lblNorthInfo.setText(String.format("⬆ Kuzey: %.1f sn", model.getGreenDuration(Direction.NORTH)));
+        lblSouthInfo.setText(String.format("⬇ Güney: %.1f sn", model.getGreenDuration(Direction.SOUTH)));
+        lblEastInfo.setText(String.format("➡ Doğu:  %.1f sn", model.getGreenDuration(Direction.EAST)));
+        lblWestInfo.setText(String.format("⬅ Batı:  %.1f sn", model.getGreenDuration(Direction.WEST)));
 
         // Simülasyon durumu
-        lblCurrentPhase.setText(String.format("Aktif: %s (%s)",
+        lblCurrentPhase.setText(String.format("🚦 Aktif: %s (%s)",
                 model.getCurrentDirection().getDisplayName(),
                 model.getCurrentLightState().getDisplayName()));
-        lblTotalTime.setText(String.format("Süre: %.1f / %d sn",
+        lblTotalTime.setText(String.format("⏰ Süre: %.1f / %d sn",
                 model.getTotalElapsedTime(), TrafficModel.TOTAL_CYCLE_TIME));
-        lblCarsPassed.setText(String.format("Geçen: %d araç", model.getTotalCarsPassed()));
-        lblRemainingCars.setText(String.format("Kalan: %d araç", model.getRemainingCars()));
+        lblCarsPassed.setText(String.format("✅ Geçen: %d araç", model.getTotalCarsPassed()));
+        lblRemainingCars.setText(String.format("🚗 Kalan: %d araç", model.getRemainingCars()));
 
         // Durum göstergesi
         if (model.isCycleComplete()) {
-            lblStatus.setText("Durum: ✅ Tamamlandı");
-            lblStatus.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold;");
+            lblStatus.setText("📍 Durum: ✅ Tamamlandı");
+            lblStatus.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
         } else if (model.isRunning()) {
-            lblStatus.setText("Durum: ▶ Çalışıyor");
+            lblStatus.setText("📍 Durum: ▶ Çalışıyor");
             lblStatus.setStyle("-fx-text-fill: #3498db; -fx-font-weight: bold;");
         } else if (model.isDataLoaded()) {
-            lblStatus.setText("Durum: ⏸ Duraklatıldı");
+            lblStatus.setText("📍 Durum: ⏸ Duraklatıldı");
             lblStatus.setStyle("-fx-text-fill: #f39c12; -fx-font-weight: bold;");
         } else {
-            lblStatus.setText("Durum: ⏹ Bekliyor");
-            lblStatus.setStyle("-fx-text-fill: #7f8c8d; -fx-font-weight: bold;");
+            lblStatus.setText("📍 Durum: ⏹ Bekliyor");
+            lblStatus.setStyle("-fx-text-fill: #95a5a6; -fx-font-weight: bold;");
         }
     }
 

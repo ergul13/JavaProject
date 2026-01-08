@@ -269,7 +269,7 @@ public class TrafficModel {
      * Araçları günceller - hareket ve çarpışma önleme.
      */
     private void updateCars(double deltaTime) {
-        // Araçları yöne göre grupla
+        // Araçları mevcut yöne göre grupla (dönüş yapmış olanlar yeni yönlerinde)
         Map<Direction, List<Car>> carsByDirection = new EnumMap<>(Direction.class);
         for (Direction dir : Direction.values()) {
             carsByDirection.put(dir, new ArrayList<>());
@@ -288,11 +288,13 @@ public class TrafficModel {
             // Araçları sırala (kavşağa en yakın önde)
             sortCarsByPosition(dirCars, dir);
 
-            TrafficLight light = trafficLights.get(dir);
-
+            // Origin direction'a göre ışık kontrolü yap
             for (int i = 0; i < dirCars.size(); i++) {
                 Car car = dirCars.get(i);
                 boolean canMove = true;
+
+                // Işık kontrolü için orijinal yönü kullan (henüz dönmemiş araçlar için)
+                TrafficLight light = trafficLights.get(car.getOriginDirection());
 
                 // 1. Öndeki araca çarpma kontrolü
                 if (i > 0) {
@@ -303,8 +305,8 @@ public class TrafficModel {
                     }
                 }
 
-                // 2. Durak çizgisi ve ışık kontrolü
-                if (canMove && !car.isPastStopLine()) {
+                // 2. Durak çizgisi ve ışık kontrolü (sadece henüz kavşağı geçmemiş araçlar için)
+                if (canMove && !car.isPastStopLine() && !car.hasTurned()) {
                     double distToStop = car.getDistanceToStopLine();
 
                     // Dur çizgisine yaklaşıyorsa ve ışık yeşil değilse dur

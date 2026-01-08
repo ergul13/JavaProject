@@ -13,16 +13,20 @@ public class Car {
     public static final int STOP_EAST = 460;
     public static final int STOP_WEST = 340;
 
+
     // Araç boyutları
     public static final int CAR_WIDTH = 25;
     public static final int CAR_LENGTH = 45;
     public static final double SAFE_DISTANCE = 55; // Araçlar arası güvenli mesafe
 
-    private final Direction direction;
+    private Direction direction;       // Mevcut hareket yönü
+    private final Direction originDirection;  // Başlangıç yönü
+    private final TurnDirection turnDirection; // Dönüş yönü (düz, sol, sağ)
     private double x, y;
     private double speed;
     private final double maxSpeed;
     private boolean hasPassed;
+    private boolean hasTurned;  // Dönüş yapıldı mı
     private final Color color;
     private final int id;
     private static int idCounter = 0;
@@ -30,12 +34,30 @@ public class Car {
     public Car(Direction direction, double x, double y) {
         this.id = idCounter++;
         this.direction = direction;
+        this.originDirection = direction;
+        this.turnDirection = randomTurnDirection();
         this.x = x;
         this.y = y;
         this.maxSpeed = 80 + random.nextDouble() * 40; // 80-120 arası rastgele hız
         this.speed = maxSpeed;
         this.hasPassed = false;
+        this.hasTurned = false;
         this.color = generateRandomColor();
+    }
+
+    /**
+     * Rastgele dönüş yönü belirler.
+     * %50 düz, %25 sol, %25 sağ
+     */
+    private TurnDirection randomTurnDirection() {
+        int rand = random.nextInt(100);
+        if (rand < 50) {
+            return TurnDirection.STRAIGHT;
+        } else if (rand < 75) {
+            return TurnDirection.LEFT;
+        } else {
+            return TurnDirection.RIGHT;
+        }
     }
 
     /**
@@ -52,8 +74,15 @@ public class Car {
 
     /**
      * Aracı delta süre kadar hareket ettirir.
+     * Kavşak merkezine geldiğinde dönüş yapar.
      */
     public void move(double deltaTime) {
+        // Kavşak içindeyken ve henüz dönmemişse dönüş kontrolü yap
+        if (!hasTurned && isAtTurnPoint()) {
+            performTurn();
+        }
+
+        // Mevcut yöne göre hareket et
         switch (direction) {
             case NORTH:
                 y += speed * deltaTime;
@@ -72,6 +101,70 @@ public class Car {
                 if (x > 850) hasPassed = true;
                 break;
         }
+    }
+
+    /**
+     * Dönüş noktasına gelip gelmediğini kontrol eder.
+     */
+    private boolean isAtTurnPoint() {
+        if (turnDirection == TurnDirection.STRAIGHT) {
+            return false; // Düz gidenlerin dönmesine gerek yok
+        }
+
+        switch (originDirection) {
+            case NORTH:
+                // Kuzeyden gelen, kavşak merkezine yaklaşınca döner
+                if (turnDirection == TurnDirection.RIGHT) {
+                    return y >= 380 && y <= 420;
+                } else { // LEFT
+                    return y >= 400 && y <= 440;
+                }
+            case SOUTH:
+                if (turnDirection == TurnDirection.RIGHT) {
+                    return y <= 420 && y >= 380;
+                } else {
+                    return y <= 400 && y >= 360;
+                }
+            case EAST:
+                if (turnDirection == TurnDirection.RIGHT) {
+                    return x <= 420 && x >= 380;
+                } else {
+                    return x <= 400 && x >= 360;
+                }
+            case WEST:
+                if (turnDirection == TurnDirection.RIGHT) {
+                    return x >= 380 && x <= 420;
+                } else {
+                    return x >= 400 && x <= 440;
+                }
+        }
+        return false;
+    }
+
+    /**
+     * Dönüş gerçekleştirir - yönü ve pozisyonu günceller.
+     */
+    private void performTurn() {
+        Direction newDirection = originDirection.getTargetDirection(turnDirection);
+
+        // Yeni yöne göre şerit pozisyonuna yerleştir
+        switch (newDirection) {
+            case NORTH:
+                x = 387; // Kuzey yönü sol şerit
+                break;
+            case SOUTH:
+                x = 412; // Güney yönü sağ şerit
+                break;
+            case EAST:
+                y = 387; // Doğu yönü üst şerit
+                break;
+            case WEST:
+                y = 412; // Batı yönü alt şerit
+                break;
+        }
+
+        this.direction = newDirection;
+        this.hasTurned = true;
     }
 
     /**
@@ -152,11 +245,14 @@ public class Car {
 
     // Getter metodları
     public Direction getDirection() { return direction; }
+    public Direction getOriginDirection() { return originDirection; }
+    public TurnDirection getTurnDirection() { return turnDirection; }
     public double getX() { return x; }
     public double getY() { return y; }
     public double getSpeed() { return speed; }
     public double getMaxSpeed() { return maxSpeed; }
     public boolean hasPassed() { return hasPassed; }
+    public boolean hasTurned() { return hasTurned; }
     public Color getColor() { return color; }
     public int getId() { return id; }
 
