@@ -19,7 +19,7 @@ public class Car {
 
     public static final int CAR_WIDTH = 25;
     public static final int CAR_LENGTH = 45;
-    public static final double SAFE_DISTANCE = 55; // Orijinal güvenli mesafe
+    public static final double SAFE_DISTANCE = 55;
 
     // === DEĞİŞKENLER ===
     private Direction direction;
@@ -145,80 +145,96 @@ public class Car {
         double overshoot = 0;
 
         if (turnDirection == TurnDirection.RIGHT) {
+            // SAĞA DÖNÜŞ (Dar Kavis R=25) - PİVOT: KÖŞELER
             turnRadius = 25;
-            turnSpeedDir = 1;
+            turnSpeedDir = 1; // Hepsi Saat Yönünde (CW) artar
 
             switch (originDirection) {
-                case NORTH:
+                case NORTH: // Aşağı -> Sağa (Batı)
+                    // Pivot: Sol-Üst (350, 350)
                     pivotX = 350; pivotY = 350;
                     overshoot = currentCy - 350;
                     currentTurnAngle = 0;
                     targetTurnAngle = Math.PI / 2;
                     break;
-                case SOUTH:
+                case SOUTH: // Yukarı -> Sağa (Doğu)
+                    // Pivot: Sağ-Alt (450, 450)
                     pivotX = 450; pivotY = 450;
                     overshoot = 450 - currentCy;
                     currentTurnAngle = Math.PI;
                     targetTurnAngle = 3 * Math.PI / 2;
                     break;
-                case EAST:
-                    pivotX = 425; pivotY = 375;
-                    turnRadius = 25;
+                case EAST: // Sola -> Sağa (Kuzey)
+                    // Pivot: Sağ-Üst (450, 350)
+                    pivotX = 450; pivotY = 350;
                     overshoot = 450 - currentCx;
-                    currentTurnAngle = 0;
-                    targetTurnAngle = -Math.PI / 2;
-                    turnSpeedDir = -1;
+                    currentTurnAngle = Math.PI / 2; // Başlangıç 90 (Aşağısı)
+                    targetTurnAngle = Math.PI;      // Bitiş 180 (Solu)
+                    // Düzeltme: East'ten gelip North'a (Yukarı) dönmek.
+                    // (450, 375)'den (425, 350)'ye.
+                    // Pivot (450, 350).
+                    // Start: (450, 350) + (0, 25) -> Angle 90.
+                    // End: (450, 350) + (-25, 0) -> Angle 180.
+                    // 90 -> 180 artıyor. turnSpeedDir = 1.
                     break;
-                case WEST:
-                    pivotX = 375; pivotY = 425;
+                case WEST: // Sağa -> Sağa (Güney)
+                    // Pivot: Sol-Alt (350, 450)
+                    pivotX = 350; pivotY = 450;
                     overshoot = currentCx - 350;
-                    currentTurnAngle = Math.PI;
-                    targetTurnAngle = Math.PI / 2;
-                    turnSpeedDir = -1;
+                    currentTurnAngle = 3 * Math.PI / 2; // Başlangıç 270 (Yukarı)
+                    targetTurnAngle = 2 * Math.PI;      // Bitiş 360 (Sağ)
+                    // (350, 425) -> (375, 450)
+                    // Start: (350, 450) + (0, -25) -> Angle 270.
+                    // End: (350, 450) + (25, 0) -> Angle 360.
+                    // 270 -> 360 artıyor. turnSpeedDir = 1.
                     break;
             }
         } else {
+            // SOLA DÖNÜŞ (Geniş Kavis R=75) - PİVOT: TERS KÖŞELER
             turnRadius = 75;
-            turnSpeedDir = -1;
+            turnSpeedDir = -1; // Hepsi Saat Yönü Tersi (CCW) azalır
 
             switch (originDirection) {
-                case NORTH:
+                case NORTH: // Aşağı -> Sola (Doğu)
+                    // Pivot: Sağ-Üst (450, 350)
                     pivotX = 450; pivotY = 350;
                     overshoot = currentCy - 350;
-                    currentTurnAngle = Math.PI;
-                    targetTurnAngle = Math.PI / 2;
+                    currentTurnAngle = Math.PI;     // 180
+                    targetTurnAngle = Math.PI / 2;  // 90
                     break;
-                case SOUTH:
+                case SOUTH: // Yukarı -> Sola (Batı)
+                    // Pivot: Sol-Alt (350, 450)
                     pivotX = 350; pivotY = 450;
                     overshoot = 450 - currentCy;
-                    currentTurnAngle = 2 * Math.PI;
-                    targetTurnAngle = 3 * Math.PI / 2;
+                    currentTurnAngle = 0;           // 0
+                    targetTurnAngle = -Math.PI / 2; // -90
+                    // 0'dan geriye gitmek için
                     break;
-                case EAST:
+                case EAST: // Sola -> Sola (Güney)
+                    // Pivot: Sağ-Alt (450, 450)
                     pivotX = 450; pivotY = 450;
                     overshoot = 450 - currentCx;
-                    currentTurnAngle = 3 * Math.PI / 2;
-                    targetTurnAngle = Math.PI;
+                    currentTurnAngle = 3 * Math.PI / 2; // 270
+                    targetTurnAngle = Math.PI;          // 180
                     break;
-                case WEST:
+                case WEST: // Sağa -> Sola (Kuzey)
+                    // Pivot: Sol-Üst (350, 350)
                     pivotX = 350; pivotY = 350;
                     overshoot = currentCx - 350;
-                    currentTurnAngle = Math.PI / 2;
-                    targetTurnAngle = 0;
+                    currentTurnAngle = Math.PI / 2; // 90
+                    targetTurnAngle = 0;            // 0
                     break;
             }
         }
 
+        // Zıplama düzeltmesi (Açıyı ileri sar)
         double angleCorrection = overshoot / turnRadius;
         if (turnSpeedDir > 0) currentTurnAngle += angleCorrection;
         else currentTurnAngle -= angleCorrection;
     }
 
     private void updateTurnMovement(double deltaTime) {
-        // --- DEĞİŞİKLİK BURADA ---
-        // Eskiden Right 0.6, Left 0.5 idi. Şimdi neredeyse tam hız yaptım.
-        // Right: 0.95 (Çok hafif yavaşlama)
-        // Left: 0.85 (Biraz daha kontrollü ama hızlı)
+        // Hızlı Dönüşler
         double turnFactor = (turnDirection == TurnDirection.RIGHT) ? 0.95 : 0.85;
         double turnSpeed = speed * turnFactor;
 
@@ -229,8 +245,8 @@ public class Car {
             if (currentTurnAngle >= targetTurnAngle) finishTurn();
         } else { // CCW
             currentTurnAngle -= angularSpeed;
-            if (currentTurnAngle <= targetTurnAngle && targetTurnAngle >= -2 * Math.PI) finishTurn();
-            if (targetTurnAngle < 0 && currentTurnAngle <= targetTurnAngle) finishTurn();
+            // Sıfır geçişi veya normal bitiş kontrolü
+            if (currentTurnAngle <= targetTurnAngle) finishTurn();
         }
 
         double cx = pivotX + turnRadius * Math.cos(currentTurnAngle);

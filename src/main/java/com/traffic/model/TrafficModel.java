@@ -3,37 +3,26 @@ package com.traffic.model;
 import java.util.*;
 
 /**
- * Trafik simülasyonunun ana model sınıfı.
- * Tüm araçlar, trafik ışıkları ve zamanlama mantığını içerir.
+ * MVC Model sinifi - Simulasyon mantigi ve veri yonetimi.
  */
 public class TrafficModel {
-    // Sabitler
-    public static final int TOTAL_CYCLE_TIME = 120;  // Toplam döngü süresi (saniye)
-    public static final int YELLOW_DURATION = 3;     // Sarı ışık süresi (saniye)
-    public static final int MIN_GREEN_TIME = 10;     // Minimum yeşil ışık süresi
-    public static final int MAX_GREEN_TIME = 60;     // Maksimum yeşil ışık süresi
+    public static final int TOTAL_CYCLE_TIME = 120;
+    public static final int YELLOW_DURATION = 1;
+    public static final int MIN_GREEN_TIME = 10;
+    public static final int MAX_GREEN_TIME = 60;
 
-    // Araç yoğunlukları (her yön için)
     private final Map<Direction, Integer> vehicleCounts;
-
-    // Trafik ışıkları (her yön için)
     private final Map<Direction, TrafficLight> trafficLights;
-
-    // Araçlar listesi
     private final List<Car> cars;
 
-    // Simülasyon durumu
     private boolean isRunning;
     private boolean isDataLoaded;
     private boolean isCycleComplete;
 
-    // Faz yönetimi
     private int currentPhaseIndex;
     private LightState currentLightState;
     private double timeInCurrentState;
     private double totalElapsedTime;
-
-    // İstatistikler
     private int totalCarsPassed;
 
     public TrafficModel() {
@@ -41,7 +30,6 @@ public class TrafficModel {
         this.trafficLights = new EnumMap<>(Direction.class);
         this.cars = new ArrayList<>();
 
-        // Trafik ışıklarını başlat
         for (Direction dir : Direction.values()) {
             trafficLights.put(dir, new TrafficLight(dir));
             vehicleCounts.put(dir, 0);
@@ -50,9 +38,6 @@ public class TrafficModel {
         resetAll();
     }
 
-    /**
-     * Araç yoğunluklarını ayarlar ve zamanlamaları hesaplar.
-     */
     public void setVehicleCounts(int north, int south, int east, int west) {
         vehicleCounts.put(Direction.NORTH, north);
         vehicleCounts.put(Direction.SOUTH, south);
@@ -67,10 +52,6 @@ public class TrafficModel {
         initializeFirstPhase();
     }
 
-    /**
-     * Yoğunluğa göre yeşil ışık sürelerini hesaplar.
-     * Formül: yeşil_süre = (yön_araç_sayısı / toplam_araç) * kullanılabilir_süre
-     */
     private void calculateGreenDurations() {
         int totalVehicles = vehicleCounts.values().stream().mapToInt(Integer::intValue).sum();
 
@@ -244,19 +225,13 @@ public class TrafficModel {
         checkCycleComplete();
     }
 
-    /**
-     * Bir sonraki faza geçer.
-     */
     private void switchPhase() {
         if (currentLightState == LightState.GREEN) {
-            // Yeşilden sarıya
             currentLightState = LightState.YELLOW;
             timeInCurrentState = YELLOW_DURATION;
         } else if (currentLightState == LightState.YELLOW) {
-            // Sarıdan kırmızıya, sonraki yön yeşile
             currentPhaseIndex = (currentPhaseIndex + 1) % 4;
 
-            // Tüm fazlar tamamlandıysa döngü bitti
             if (currentPhaseIndex == 0 && totalElapsedTime > YELLOW_DURATION) {
                 isCycleComplete = true;
                 isRunning = false;
@@ -269,11 +244,7 @@ public class TrafficModel {
         }
     }
 
-    /**
-     * Araçları günceller - hareket, çarpışma önleme ve kavşak güvenliği.
-     */
     private void updateCars(double deltaTime) {
-        // Araçları mevcut yöne göre grupla (dönüş yapmış olanlar yeni yönlerinde)
         Map<Direction, List<Car>> carsByDirection = new EnumMap<>(Direction.class);
         for (Direction dir : Direction.values()) {
             carsByDirection.put(dir, new ArrayList<>());
@@ -285,59 +256,42 @@ public class TrafficModel {
             }
         }
 
-        // Her yön için araçları işle
         for (Direction dir : Direction.values()) {
             List<Car> dirCars = carsByDirection.get(dir);
 
-            // Araçları sırala (kavşağa en yakın önde)
             sortCarsByPosition(dirCars, dir);
 
             for (int i = 0; i < dirCars.size(); i++) {
                 Car car = dirCars.get(i);
-
-                // Işık kontrolü için orijinal yönü kullan
                 TrafficLight light = trafficLights.get(car.getOriginDirection());
 
-                // === ÇARPIŞMA ÖNLEME ===
-                double speedFactor = 1.0; // 1.0 = tam hız, 0.0 = dur
+                double speedFactor = 1.0;
 
-                // 1. Öndeki araca olan mesafeyi kontrol et
                 if (i > 0) {
                     Car carAhead = dirCars.get(i - 1);
                     double distance = car.getDistanceToCarAhead(carAhead);
-
-                    // Güvenli takip mesafesi hesapla
                     double safeDistance = Car.SAFE_DISTANCE;
-                    double criticalDistance = Car.CAR_LENGTH + 5; // Minimum mesafe
+                    double criticalDistance = Car.CAR_LENGTH + 5;
 
                     if (distance < criticalDistance) {
-                        // Çok yakın - tamamen dur
                         speedFactor = 0.0;
                     } else if (distance < safeDistance) {
-                        // Yaklaşıyor - kademeli yavaşla
                         speedFactor = (distance - criticalDistance) / (safeDistance - criticalDistance);
-                        speedFactor = Math.max(0.1, speedFactor); // En az %10 hız
+                        speedFactor = Math.max(0.1, speedFactor);
                     }
                 }
 
-                // === KAVŞAK GÜVENLİĞİ ===
-                // Kavşak içindeki veya dönüş yapan araçlar ASLA durmamalı
                 boolean isInIntersectionArea = car.isInIntersection() || car.isTurning() || car.hasTurned();
                 boolean hasCrossedStopLine = car.isPastStopLine();
 
-                // === IŞIK KONTROLÜ ===
-                // Sadece kavşağa GİRMEMİŞ araçlar ışığa uyar
                 if (!isInIntersectionArea && !hasCrossedStopLine) {
                     double distToStop = car.getDistanceToStopLine();
 
-                    // Durak çizgisine yaklaşıyorsa
                     if (distToStop > 0 && distToStop < 50) {
                         if (!light.allowsPass()) {
-                            // Işık kırmızı veya sarı - yavaşla ve dur
                             double stopFactor = distToStop / 50.0;
                             speedFactor = Math.min(speedFactor, stopFactor);
 
-                            // Çizgiye çok yakınsa tamamen dur
                             if (distToStop < 10) {
                                 speedFactor = 0.0;
                             }
@@ -345,7 +299,6 @@ public class TrafficModel {
                     }
                 }
 
-                // === HAREKET UYGULA ===
                 if (speedFactor <= 0.01) {
                     car.stop();
                 } else {
@@ -353,20 +306,15 @@ public class TrafficModel {
                     car.move(deltaTime);
                 }
 
-                // === GEÇİŞ SAYACI ===
                 if (car.hasPassed()) {
                     totalCarsPassed++;
                 }
             }
         }
 
-        // Farklı yönlerden gelen araçlar arasında kavşak içi çarpışma kontrolü
         checkIntersectionCollisions(carsByDirection);
     }
 
-    /**
-     * Kavşak içinde farklı yönlerden gelen araçlar arasındaki çarpışmaları kontrol eder.
-     */
     private void checkIntersectionCollisions(Map<Direction, List<Car>> carsByDirection) {
         List<Car> carsInIntersection = new ArrayList<>();
 
