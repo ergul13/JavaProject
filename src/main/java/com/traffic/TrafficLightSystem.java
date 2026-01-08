@@ -1,89 +1,63 @@
 package com.traffic;
 
+import com.traffic.controller.TrafficController;
 import com.traffic.model.TrafficModel;
 import com.traffic.view.TrafficView;
-import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
-import java.util.Random;
-
+/**
+ * Araç Yoğunluğuna Dayalı Akıllı Trafik Işığı Kontrol Sistemi
+ *
+ * Bu uygulama MVC (Model-View-Controller) mimarisini kullanarak
+ * 4 yönlü bir kavşakta araç yoğunluğuna göre trafik ışık sürelerini
+ * dinamik olarak hesaplar ve simüle eder.
+ *
+ * Özellikler:
+ * - 120 saniyelik sabit döngü süresi
+ * - Yoğunluğa göre yeşil ışık süresi hesaplama
+ * - 3 saniyelik sabit sarı ışık süresi
+ * - Minimum 10sn, maksimum 60sn yeşil ışık sınırları
+ * - Çarpışma önleme sistemi
+ * - Araç animasyonları
+ *
+ * @author Traffic Light Control System Team
+ */
 public class TrafficLightSystem extends Application {
-    private TrafficModel model;
-    private TrafficView view;
-    private AnimationTimer timer;
-    private long lastTime = 0;
+
+    private TrafficController controller;
 
     @Override
     public void start(Stage primaryStage) {
-        model = new TrafficModel();
-        view = new TrafficView();
+        // MVC bileşenlerini oluştur
+        TrafficModel model = new TrafficModel();
+        TrafficView view = new TrafficView();
+        controller = new TrafficController(model, view);
 
-        view.btnRandom.setOnAction(e -> {
-            Random r = new Random();
-            view.tfNorth.setText(String.valueOf(r.nextInt(50) + 5));
-            view.tfSouth.setText(String.valueOf(r.nextInt(50) + 5));
-            view.tfEast.setText(String.valueOf(r.nextInt(50) + 5));
-            view.tfWest.setText(String.valueOf(r.nextInt(50) + 5));
-        });
+        Scene scene = new Scene(view, 1050, 820);
 
-        view.btnStart.setOnAction(e -> {
-            try {
-                int n = Integer.parseInt(view.tfNorth.getText());
-                int s = Integer.parseInt(view.tfSouth.getText());
-                int eDir = Integer.parseInt(view.tfEast.getText());
-                int w = Integer.parseInt(view.tfWest.getText());
-
-                if (!model.isRunning()) {
-                    model.setVehicleCounts(n, s, eDir, w);
-                }
-                model.setRunning(true);
-                view.btnStart.setDisable(true);
-                view.btnPause.setDisable(false);
-            } catch (NumberFormatException ex) {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Please enter valid numbers.");
-                alert.show();
-            }
-        });
-
-        view.btnPause.setOnAction(e -> {
-            model.setRunning(false);
-            view.btnStart.setDisable(false);
-            view.btnPause.setDisable(true);
-        });
-
-        view.btnReset.setOnAction(e -> {
-            model.setRunning(false);
-            model.resetSimulationState();
-            view.draw(model);
-            view.btnStart.setDisable(false);
-            view.btnPause.setDisable(true);
-        });
-
-        timer = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
-                if (lastTime == 0) {
-                    lastTime = now;
-                    return;
-                }
-                double secondsElapsed = (now - lastTime) / 1_000_000_000.0;
-                lastTime = now;
-
-                model.update(secondsElapsed);
-                view.draw(model);
-            }
-        };
-        timer.start();
-
-        Scene scene = new Scene(view, 1050, 800);
-        primaryStage.setTitle("Traffic Light Control System - MVC");
+        // Pencere ayarları
+        primaryStage.setTitle("🚦 Araç Yoğunluğuna Dayalı Trafik Işığı Kontrol Sistemi");
         primaryStage.setScene(scene);
-        primaryStage.show();
+        primaryStage.setResizable(false);
 
-        view.draw(model);
+        // Pencere kapatıldığında controller'ı durdur
+        primaryStage.setOnCloseRequest(e -> {
+            if (controller != null) {
+                controller.stop();
+            }
+        });
+
+        primaryStage.show();
+    }
+
+    @Override
+    public void stop() {
+        // Uygulama kapatılırken temizlik
+        if (controller != null) {
+            controller.stop();
+        }
     }
 
     public static void main(String[] args) {
