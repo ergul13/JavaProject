@@ -201,9 +201,8 @@ public class Car {
 
     /**
      * SAĞA DÖNÜŞ için çeyrek daire hesaplar.
-     * Sağa dönüşler kavşağın yakın köşesinden küçük yarıçaplı dönüş yapar.
-     *
-     * NOT: x,y koordinatları aracın SOL ÜST köşesidir.
+     * Sağa dönüşler kavşağın İÇ KÖŞESİNDEN küçük yarıçaplı dar kavis çizer.
+     * Kontrol noktası kaldırım köşesine yakın olduğu için kısa ve keskin bir yay oluşur.
      *
      * Gerçek trafik kurallarına göre sağa dönüş yönleri:
      * NORTH → EAST (yukarı giderken sağa dön) - dar ark
@@ -221,23 +220,24 @@ public class Car {
         // Offset: araç pozisyonu sol üst köşe olduğundan
         final double HALF_WIDTH = CAR_WIDTH / 2.0;
 
+        // Sağa dönüş için KÜÇÜK yarıçap (iç köşeden geçen dar kavis)
+        // Yarıçap = şerit merkezi ile kavşak kenarı arasındaki mesafe
         double radius;
 
         switch (originDirection) {
             case NORTH:
-                // Kuzeyden gelip DOĞUYA dönüyor (sağa dönüş = dar ark)
-                // Başlangıç: Kuzey şeridinde, kavşak üst sınırında
+                // Kuzeyden gelip DOĞUYA dönüyor
+                // İç köşe: Sağ-Üst köşe (INTERSECTION_RIGHT, INTERSECTION_TOP)
                 turnStartX = LANE_NORTH_X - HALF_WIDTH;
                 turnStartY = INTERSECTION_TOP;
 
-                // Bitiş: Doğu şeridinde, kavşak sağ sınırında
                 turnEndX = INTERSECTION_RIGHT;
                 turnEndY = LANE_EAST_Y - HALF_WIDTH;
 
-                // Yarıçap: Kuzey şeridi ile Doğu şeridi arasındaki mesafe (dar)
-                radius = Math.abs(LANE_EAST_Y - INTERSECTION_TOP);
+                // Küçük yarıçap: Şerit merkezi ile kavşak kenarı arası
+                radius = INTERSECTION_RIGHT - LANE_NORTH_X;
 
-                // Kontrol noktaları - çeyrek daire için
+                // Kontrol noktaları - iç köşeye yakın
                 turnControlX = turnStartX;
                 turnControlY = turnStartY + radius * K;
                 turnControl2X = turnEndX - radius * K;
@@ -245,14 +245,16 @@ public class Car {
                 break;
 
             case SOUTH:
-                // Güneyden gelip BATIYA dönüyor (sağa dönüş = dar ark)
+                // Güneyden gelip BATIYA dönüyor
+                // İç köşe: Sol-Alt köşe (INTERSECTION_LEFT, INTERSECTION_BOTTOM)
                 turnStartX = LANE_SOUTH_X - HALF_WIDTH;
                 turnStartY = INTERSECTION_BOTTOM;
 
                 turnEndX = INTERSECTION_LEFT - CAR_LENGTH;
                 turnEndY = LANE_WEST_Y - HALF_WIDTH;
 
-                radius = Math.abs(INTERSECTION_BOTTOM - LANE_WEST_Y);
+                // Küçük yarıçap
+                radius = LANE_SOUTH_X - INTERSECTION_LEFT;
 
                 turnControlX = turnStartX;
                 turnControlY = turnStartY - radius * K;
@@ -261,14 +263,16 @@ public class Car {
                 break;
 
             case EAST:
-                // Doğudan gelip GÜNEYE dönüyor (sağa dönüş = dar ark)
+                // Doğudan gelip GÜNEYE dönüyor
+                // İç köşe: Sağ-Alt köşe (INTERSECTION_RIGHT, INTERSECTION_BOTTOM)
                 turnStartX = INTERSECTION_RIGHT;
                 turnStartY = LANE_EAST_Y - HALF_WIDTH;
 
                 turnEndX = LANE_SOUTH_X - HALF_WIDTH;
                 turnEndY = INTERSECTION_BOTTOM;
 
-                radius = Math.abs(INTERSECTION_RIGHT - LANE_SOUTH_X);
+                // Küçük yarıçap
+                radius = INTERSECTION_BOTTOM - LANE_EAST_Y;
 
                 turnControlX = turnStartX - radius * K;
                 turnControlY = turnStartY;
@@ -277,14 +281,16 @@ public class Car {
                 break;
 
             case WEST:
-                // Batıdan gelip KUZEYE dönüyor (sağa dönüş = dar ark)
+                // Batıdan gelip KUZEYE dönüyor
+                // İç köşe: Sol-Üst köşe (INTERSECTION_LEFT, INTERSECTION_TOP)
                 turnStartX = INTERSECTION_LEFT;
                 turnStartY = LANE_WEST_Y - HALF_WIDTH;
 
                 turnEndX = LANE_NORTH_X - HALF_WIDTH;
                 turnEndY = INTERSECTION_TOP - CAR_LENGTH;
 
-                radius = Math.abs(LANE_WEST_Y - INTERSECTION_TOP);
+                // Küçük yarıçap
+                radius = LANE_WEST_Y - INTERSECTION_TOP;
 
                 turnControlX = turnStartX + radius * K;
                 turnControlY = turnStartY;
@@ -296,15 +302,15 @@ public class Car {
 
     /**
      * SOLA DÖNÜŞ için çeyrek daire hesaplar.
-     * Sola dönüşler kavşağın merkezinden geçerek geniş yarıçaplı dönüş yapar.
-     *
-     * NOT: x,y koordinatları aracın SOL ÜST köşesidir.
+     * Sola dönüşler kavşağın MERKEZİNDEN geçerek büyük yarıçaplı geniş kavis çizer.
+     * Kontrol noktası kavşağın merkezine yakın olduğu için uzun ve geniş bir yay oluşur.
+     * Bu sayede karşı şeritten gelen araçlara veya refüje çarpmaz.
      *
      * Gerçek trafik kurallarına göre sola dönüş yönleri:
-     * NORTH → WEST (yukarı giderken sola dön)
-     * SOUTH → EAST (aşağı giderken sola dön)
-     * EAST → NORTH (sola giderken sola dön)
-     * WEST → SOUTH (sağa giderken sola dön)
+     * NORTH → WEST (yukarı giderken sola dön) - geniş ark
+     * SOUTH → EAST (aşağı giderken sola dön) - geniş ark
+     * EAST → NORTH (sola giderken sola dön) - geniş ark
+     * WEST → SOUTH (sağa giderken sola dön) - geniş ark
      */
     private void calculateLeftTurnArc(double K) {
         // Kavşak sınırları
@@ -313,23 +319,29 @@ public class Car {
         final double INTERSECTION_LEFT = 350;
         final double INTERSECTION_RIGHT = 450;
 
+        // Kavşak merkezi
+        final double CENTER_X = 400;
+        final double CENTER_Y = 400;
+
         // Offset
         final double HALF_WIDTH = CAR_WIDTH / 2.0;
 
+        // Sola dönüş için BÜYÜK yarıçap (kavşak merkezinden geçen geniş kavis)
         double radius;
 
         switch (originDirection) {
             case NORTH:
-                // Kuzeyden gelip BATIYA dönüyor (sola dönüş = geniş ark)
+                // Kuzeyden gelip BATIYA dönüyor
+                // Geniş kavis: Kavşak merkezinden geçerek sol tarafa
                 turnStartX = LANE_NORTH_X - HALF_WIDTH;
                 turnStartY = INTERSECTION_TOP;
 
-                // Bitiş: Batı şeridinde, kavşak sol sınırında
                 turnEndX = INTERSECTION_LEFT - CAR_LENGTH;
                 turnEndY = LANE_WEST_Y - HALF_WIDTH;
 
-                // Yarıçap: geniş dönüş için büyük yarıçap (kavşak merkezinden geçer)
-                radius = LANE_WEST_Y - INTERSECTION_TOP;
+                // Büyük yarıçap: Kavşağın karşı köşesine kadar (dış köşeden geçer)
+                // Başlangıç şeridi ile bitiş şeridi arasındaki tam mesafe
+                radius = LANE_WEST_Y - INTERSECTION_TOP + (CENTER_Y - LANE_WEST_Y);
 
                 turnControlX = turnStartX;
                 turnControlY = turnStartY + radius * K;
@@ -338,14 +350,16 @@ public class Car {
                 break;
 
             case SOUTH:
-                // Güneyden gelip DOĞUYA dönüyor (sola dönüş = geniş ark)
+                // Güneyden gelip DOĞUYA dönüyor
+                // Geniş kavis: Kavşak merkezinden geçerek sağ tarafa
                 turnStartX = LANE_SOUTH_X - HALF_WIDTH;
                 turnStartY = INTERSECTION_BOTTOM;
 
                 turnEndX = INTERSECTION_RIGHT;
                 turnEndY = LANE_EAST_Y - HALF_WIDTH;
 
-                radius = INTERSECTION_BOTTOM - LANE_EAST_Y;
+                // Büyük yarıçap
+                radius = INTERSECTION_BOTTOM - LANE_EAST_Y + (LANE_EAST_Y - CENTER_Y);
 
                 turnControlX = turnStartX;
                 turnControlY = turnStartY - radius * K;
@@ -354,14 +368,16 @@ public class Car {
                 break;
 
             case EAST:
-                // Doğudan gelip KUZEYE dönüyor (sola dönüş = geniş ark)
+                // Doğudan gelip KUZEYE dönüyor
+                // Geniş kavis: Kavşak merkezinden geçerek yukarı
                 turnStartX = INTERSECTION_RIGHT;
                 turnStartY = LANE_EAST_Y - HALF_WIDTH;
 
                 turnEndX = LANE_NORTH_X - HALF_WIDTH;
                 turnEndY = INTERSECTION_TOP - CAR_LENGTH;
 
-                radius = INTERSECTION_RIGHT - LANE_NORTH_X;
+                // Büyük yarıçap
+                radius = INTERSECTION_RIGHT - LANE_NORTH_X + (CENTER_X - LANE_NORTH_X);
 
                 turnControlX = turnStartX - radius * K;
                 turnControlY = turnStartY;
@@ -370,14 +386,16 @@ public class Car {
                 break;
 
             case WEST:
-                // Batıdan gelip GÜNEYE dönüyor (sola dönüş = geniş ark)
+                // Batıdan gelip GÜNEYE dönüyor
+                // Geniş kavis: Kavşak merkezinden geçerek aşağı
                 turnStartX = INTERSECTION_LEFT;
                 turnStartY = LANE_WEST_Y - HALF_WIDTH;
 
                 turnEndX = LANE_SOUTH_X - HALF_WIDTH;
                 turnEndY = INTERSECTION_BOTTOM;
 
-                radius = LANE_WEST_Y - INTERSECTION_TOP;
+                // Büyük yarıçap
+                radius = LANE_SOUTH_X - INTERSECTION_LEFT + (LANE_SOUTH_X - CENTER_X);
 
                 turnControlX = turnStartX + radius * K;
                 turnControlY = turnStartY;
