@@ -90,9 +90,7 @@ public class Car {
         }
     }
 
-    /**
-     * Araç için rastgele renk oluşturur.
-     */
+
     private Color generateRandomColor() {
         Color[] colors = {
             Color.BLUE, Color.RED, Color.ORANGE, Color.PURPLE,
@@ -152,195 +150,239 @@ public class Car {
 
     /**
      * Dönüş başlatılmalı mı kontrol eder.
+     * Araç kavşak sınırına ulaştığında dönüşe başlar.
      */
     private boolean shouldStartTurn() {
         if (turnDirection == TurnDirection.STRAIGHT) {
             return false;
         }
 
-        // Kavşağa giriş noktaları (dönüş başlangıç noktaları)
+        // Kavşak sınırları - araç bu noktalara ulaştığında dönüşe başlar
         switch (originDirection) {
             case NORTH:
-                return y >= 350 && y <= 360;
+                // Kuzeyden gelen: y >= 350 olduğunda kavşağa girmiştir
+                return y >= 345 && y <= 360;
             case SOUTH:
-                return y <= 450 && y >= 440;
+                // Güneyden gelen: y <= 450 olduğunda kavşağa girmiştir
+                return y <= 455 && y >= 440;
             case EAST:
-                return x <= 450 && x >= 440;
+                // Doğudan gelen: x <= 450 olduğunda kavşağa girmiştir
+                return x <= 455 && x >= 440;
             case WEST:
-                return x >= 350 && x <= 360;
+                // Batıdan gelen: x >= 350 olduğunda kavşağa girmiştir
+                return x >= 345 && x <= 360;
         }
         return false;
     }
 
     /**
-     * Dönüş işlemini başlatır ve Bezier eğrisi kontrol noktalarını hesaplar.
+     * Dönüş işlemini başlatır ve çeyrek daire eğrisi hesaplar.
+     *
+     * TEMEL GEOMETRİ:
+     * - Başlangıç noktası: Mevcut şeridin merkezi, kavşak kenarında
+     * - Bitiş noktası: Hedef şeridin merkezi, kavşak kenarında
+     * - Bu iki nokta arasında tam 90 derece bir ark (çeyrek daire)
+     * - Arkın merkezi: İki şeridin kesiştiği köşe noktası
      */
     private void startTurn() {
-        Direction targetDir = originDirection.getTargetDirection(turnDirection);
-
-        turnStartX = x;
-        turnStartY = y;
         isTurning = true;
         turnProgress = 0;
 
-        // Dönüş bitiş noktası ve kontrol noktası hesapla
-        calculateTurnPath(targetDir);
-    }
-
-    /**
-     * Dönüş yolunu hesaplar (Cubic Bezier eğrisi kontrol noktaları).
-     * Gerçekçi dönüş yolu için her yön kombinasyonu özel olarak hesaplanır.
-     */
-    private void calculateTurnPath(Direction targetDir) {
+        // Çeyrek daire için Bezier katsayısı (4/3 * tan(π/8) ≈ 0.5523)
+        // Bu katsayı Cubic Bezier ile mükemmel bir çeyrek daire çizmeyi sağlar
+        final double K = 0.5522847498;
 
         if (turnDirection == TurnDirection.RIGHT) {
-            // SAĞA DÖNÜŞ - Kısa yarıçap, kavşağın yakın köşesinden
-            calculateRightTurnPath();
+            calculateRightTurnArc(K);  // Sağa dönüş = dar ark (yakın köşeden)
         } else {
-            // SOLA DÖNÜŞ - Geniş yarıçap, kavşak merkezinden geçerek
-            calculateLeftTurnPath();
+            calculateLeftTurnArc(K);   // Sola dönüş = geniş ark (kavşak merkezinden)
         }
     }
 
     /**
-     * Sağa dönüş yolunu hesaplar.
-     * Sağa dönüş dar bir çeyrek daire çizer.
-     * NORTH → WEST, SOUTH → EAST, EAST → NORTH, WEST → SOUTH
+     * SAĞA DÖNÜŞ için çeyrek daire hesaplar.
+     * Sağa dönüşler kavşağın yakın köşesinden küçük yarıçaplı dönüş yapar.
      *
-     * Çeyrek daire için Cubic Bezier kontrol noktası katsayısı: k ≈ 0.5523
-     * Bu, P0'dan P1'e ve P3'ten P2'ye olan mesafenin yarıçap * k olmasını sağlar.
+     * NOT: x,y koordinatları aracın SOL ÜST köşesidir.
+     *
+     * Gerçek trafik kurallarına göre sağa dönüş yönleri:
+     * NORTH → EAST (yukarı giderken sağa dön) - dar ark
+     * SOUTH → WEST (aşağı giderken sağa dön) - dar ark
+     * EAST → SOUTH (sola giderken sağa dön) - dar ark
+     * WEST → NORTH (sağa giderken sağa dön) - dar ark
      */
-    private void calculateRightTurnPath() {
-        // Çeyrek daire için Bezier katsayısı (4/3 * tan(π/8))
-        final double K = 0.5522847498;
+    private void calculateRightTurnArc(double K) {
+        // Kavşak sınırları
+        final double INTERSECTION_TOP = 350;
+        final double INTERSECTION_BOTTOM = 450;
+        final double INTERSECTION_LEFT = 350;
+        final double INTERSECTION_RIGHT = 450;
+
+        // Offset: araç pozisyonu sol üst köşe olduğundan
+        final double HALF_WIDTH = CAR_WIDTH / 2.0;
+
+        double radius;
 
         switch (originDirection) {
-            case NORTH: // Yukarı gidiyor, BATIYA dönecek
-                // Başlangıç: (LANE_NORTH_X, turnStartY) - kuzey şeridinde
-                // Bitiş: hedef LANE_WEST_Y şeridine, kavşağın sol kenarına
-                turnStartX = LANE_NORTH_X - CAR_WIDTH / 2.0;
-                turnEndX = STOP_WEST - 10;
-                turnEndY = LANE_WEST_Y - CAR_WIDTH / 2.0;
+            case NORTH:
+                // Kuzeyden gelip DOĞUYA dönüyor (sağa dönüş = dar ark)
+                // Başlangıç: Kuzey şeridinde, kavşak üst sınırında
+                turnStartX = LANE_NORTH_X - HALF_WIDTH;
+                turnStartY = INTERSECTION_TOP;
 
-                // Yarıçap: başlangıç ile bitiş arasındaki mesafe
-                double radiusNR = Math.abs(turnEndY - turnStartY);
+                // Bitiş: Doğu şeridinde, kavşak sağ sınırında
+                turnEndX = INTERSECTION_RIGHT;
+                turnEndY = LANE_EAST_Y - HALF_WIDTH;
 
-                // P1: Başlangıçtan hareket yönünde (yukarı = +y)
+                // Yarıçap: Kuzey şeridi ile Doğu şeridi arasındaki mesafe (dar)
+                radius = Math.abs(LANE_EAST_Y - INTERSECTION_TOP);
+
+                // Kontrol noktaları - çeyrek daire için
                 turnControlX = turnStartX;
-                turnControlY = turnStartY + radiusNR * K;
-                // P2: Bitişten hareket yönünün tersine (sola = +x)
-                turnControl2X = turnEndX + radiusNR * K;
+                turnControlY = turnStartY + radius * K;
+                turnControl2X = turnEndX - radius * K;
                 turnControl2Y = turnEndY;
                 break;
 
-            case SOUTH: // Aşağı gidiyor, DOĞUYA dönecek
-                turnStartX = LANE_SOUTH_X - CAR_WIDTH / 2.0;
-                turnEndX = STOP_EAST + 10;
-                turnEndY = LANE_EAST_Y - CAR_WIDTH / 2.0;
+            case SOUTH:
+                // Güneyden gelip BATIYA dönüyor (sağa dönüş = dar ark)
+                turnStartX = LANE_SOUTH_X - HALF_WIDTH;
+                turnStartY = INTERSECTION_BOTTOM;
 
-                double radiusSR = Math.abs(turnStartY - turnEndY);
+                turnEndX = INTERSECTION_LEFT - CAR_LENGTH;
+                turnEndY = LANE_WEST_Y - HALF_WIDTH;
+
+                radius = Math.abs(INTERSECTION_BOTTOM - LANE_WEST_Y);
 
                 turnControlX = turnStartX;
-                turnControlY = turnStartY - radiusSR * K;
-                turnControl2X = turnEndX - radiusSR * K;
+                turnControlY = turnStartY - radius * K;
+                turnControl2X = turnEndX + radius * K;
                 turnControl2Y = turnEndY;
                 break;
 
-            case EAST: // Sola gidiyor, KUZEYE dönecek
-                turnStartY = LANE_EAST_Y - CAR_WIDTH / 2.0;
-                turnEndX = LANE_NORTH_X - CAR_WIDTH / 2.0;
-                turnEndY = STOP_NORTH - 10;
+            case EAST:
+                // Doğudan gelip GÜNEYE dönüyor (sağa dönüş = dar ark)
+                turnStartX = INTERSECTION_RIGHT;
+                turnStartY = LANE_EAST_Y - HALF_WIDTH;
 
-                double radiusER = Math.abs(turnStartX - turnEndX);
+                turnEndX = LANE_SOUTH_X - HALF_WIDTH;
+                turnEndY = INTERSECTION_BOTTOM;
 
-                turnControlX = turnStartX - radiusER * K;
+                radius = Math.abs(INTERSECTION_RIGHT - LANE_SOUTH_X);
+
+                turnControlX = turnStartX - radius * K;
                 turnControlY = turnStartY;
                 turnControl2X = turnEndX;
-                turnControl2Y = turnEndY + radiusER * K;
+                turnControl2Y = turnEndY - radius * K;
                 break;
 
-            case WEST: // Sağa gidiyor, GÜNEYE dönecek
-                turnStartY = LANE_WEST_Y - CAR_WIDTH / 2.0;
-                turnEndX = LANE_SOUTH_X - CAR_WIDTH / 2.0;
-                turnEndY = STOP_SOUTH + 10;
+            case WEST:
+                // Batıdan gelip KUZEYE dönüyor (sağa dönüş = dar ark)
+                turnStartX = INTERSECTION_LEFT;
+                turnStartY = LANE_WEST_Y - HALF_WIDTH;
 
-                double radiusWR = Math.abs(turnEndX - turnStartX);
+                turnEndX = LANE_NORTH_X - HALF_WIDTH;
+                turnEndY = INTERSECTION_TOP - CAR_LENGTH;
 
-                turnControlX = turnStartX + radiusWR * K;
+                radius = Math.abs(LANE_WEST_Y - INTERSECTION_TOP);
+
+                turnControlX = turnStartX + radius * K;
                 turnControlY = turnStartY;
                 turnControl2X = turnEndX;
-                turnControl2Y = turnEndY - radiusWR * K;
+                turnControl2Y = turnEndY + radius * K;
                 break;
         }
     }
 
     /**
-     * Sola dönüş yolunu hesaplar.
-     * Sola dönüş geniş bir çeyrek daire çizer (kavşak merkezinden geçer).
-     * NORTH → EAST, SOUTH → WEST, EAST → SOUTH, WEST → NORTH
+     * SOLA DÖNÜŞ için çeyrek daire hesaplar.
+     * Sola dönüşler kavşağın merkezinden geçerek geniş yarıçaplı dönüş yapar.
      *
-     * Çeyrek daire için Cubic Bezier kontrol noktası katsayısı: k ≈ 0.5523
+     * NOT: x,y koordinatları aracın SOL ÜST köşesidir.
+     *
+     * Gerçek trafik kurallarına göre sola dönüş yönleri:
+     * NORTH → WEST (yukarı giderken sola dön)
+     * SOUTH → EAST (aşağı giderken sola dön)
+     * EAST → NORTH (sola giderken sola dön)
+     * WEST → SOUTH (sağa giderken sola dön)
      */
-    private void calculateLeftTurnPath() {
-        // Çeyrek daire için Bezier katsayısı
-        final double K = 0.5522847498;
+    private void calculateLeftTurnArc(double K) {
+        // Kavşak sınırları
+        final double INTERSECTION_TOP = 350;
+        final double INTERSECTION_BOTTOM = 450;
+        final double INTERSECTION_LEFT = 350;
+        final double INTERSECTION_RIGHT = 450;
+
+        // Offset
+        final double HALF_WIDTH = CAR_WIDTH / 2.0;
+
+        double radius;
 
         switch (originDirection) {
-            case NORTH: // Yukarı gidiyor, DOĞUYA dönecek
-                // Başlangıç: kuzey şeridinde
-                // Bitiş: doğu şeridinde (LANE_EAST_Y), kavşağın sağ kenarına
-                turnStartX = LANE_NORTH_X - CAR_WIDTH / 2.0;
-                turnEndX = STOP_EAST + 10;
-                turnEndY = LANE_EAST_Y - CAR_WIDTH / 2.0;
+            case NORTH:
+                // Kuzeyden gelip BATIYA dönüyor (sola dönüş = geniş ark)
+                turnStartX = LANE_NORTH_X - HALF_WIDTH;
+                turnStartY = INTERSECTION_TOP;
 
-                // Yarıçap: başlangıç ile bitiş arasındaki dikey mesafe
-                double radiusNL = Math.abs(turnEndY - turnStartY);
+                // Bitiş: Batı şeridinde, kavşak sol sınırında
+                turnEndX = INTERSECTION_LEFT - CAR_LENGTH;
+                turnEndY = LANE_WEST_Y - HALF_WIDTH;
 
-                // P1: Başlangıçtan yukarı yönde
+                // Yarıçap: geniş dönüş için büyük yarıçap (kavşak merkezinden geçer)
+                radius = LANE_WEST_Y - INTERSECTION_TOP;
+
                 turnControlX = turnStartX;
-                turnControlY = turnStartY + radiusNL * K;
-                // P2: Bitişten sola yönde (doğuya gidecek, yani -x yönünde gelecek)
-                turnControl2X = turnEndX - radiusNL * K;
+                turnControlY = turnStartY + radius * K;
+                turnControl2X = turnEndX + radius * K;
                 turnControl2Y = turnEndY;
                 break;
 
-            case SOUTH: // Aşağı gidiyor, BATIYA dönecek
-                turnStartX = LANE_SOUTH_X - CAR_WIDTH / 2.0;
-                turnEndX = STOP_WEST - 10;
-                turnEndY = LANE_WEST_Y - CAR_WIDTH / 2.0;
+            case SOUTH:
+                // Güneyden gelip DOĞUYA dönüyor (sola dönüş = geniş ark)
+                turnStartX = LANE_SOUTH_X - HALF_WIDTH;
+                turnStartY = INTERSECTION_BOTTOM;
 
-                double radiusSL = Math.abs(turnStartY - turnEndY);
+                turnEndX = INTERSECTION_RIGHT;
+                turnEndY = LANE_EAST_Y - HALF_WIDTH;
+
+                radius = INTERSECTION_BOTTOM - LANE_EAST_Y;
 
                 turnControlX = turnStartX;
-                turnControlY = turnStartY - radiusSL * K;
-                turnControl2X = turnEndX + radiusSL * K;
+                turnControlY = turnStartY - radius * K;
+                turnControl2X = turnEndX - radius * K;
                 turnControl2Y = turnEndY;
                 break;
 
-            case EAST: // Sola gidiyor, GÜNEYE dönecek
-                turnStartY = LANE_EAST_Y - CAR_WIDTH / 2.0;
-                turnEndX = LANE_SOUTH_X - CAR_WIDTH / 2.0;
-                turnEndY = STOP_SOUTH + 10;
+            case EAST:
+                // Doğudan gelip KUZEYE dönüyor (sola dönüş = geniş ark)
+                turnStartX = INTERSECTION_RIGHT;
+                turnStartY = LANE_EAST_Y - HALF_WIDTH;
 
-                double radiusEL = Math.abs(turnEndY - turnStartY);
+                turnEndX = LANE_NORTH_X - HALF_WIDTH;
+                turnEndY = INTERSECTION_TOP - CAR_LENGTH;
 
-                turnControlX = turnStartX - radiusEL * K;
+                radius = INTERSECTION_RIGHT - LANE_NORTH_X;
+
+                turnControlX = turnStartX - radius * K;
                 turnControlY = turnStartY;
                 turnControl2X = turnEndX;
-                turnControl2Y = turnEndY - radiusEL * K;
+                turnControl2Y = turnEndY + radius * K;
                 break;
 
-            case WEST: // Sağa gidiyor, KUZEYE dönecek
-                turnStartY = LANE_WEST_Y - CAR_WIDTH / 2.0;
-                turnEndX = LANE_NORTH_X - CAR_WIDTH / 2.0;
-                turnEndY = STOP_NORTH - 10;
+            case WEST:
+                // Batıdan gelip GÜNEYE dönüyor (sola dönüş = geniş ark)
+                turnStartX = INTERSECTION_LEFT;
+                turnStartY = LANE_WEST_Y - HALF_WIDTH;
 
-                double radiusWL = Math.abs(turnStartY - turnEndY);
+                turnEndX = LANE_SOUTH_X - HALF_WIDTH;
+                turnEndY = INTERSECTION_BOTTOM;
 
-                turnControlX = turnStartX + radiusWL * K;
+                radius = LANE_WEST_Y - INTERSECTION_TOP;
+
+                turnControlX = turnStartX + radius * K;
                 turnControlY = turnStartY;
                 turnControl2X = turnEndX;
-                turnControl2Y = turnEndY + radiusWL * K;
+                turnControl2Y = turnEndY - radius * K;
                 break;
         }
     }
@@ -419,16 +461,30 @@ public class Car {
 
 
     /**
-     * Dönüşü tamamlar.
+     * Dönüşü tamamlar ve aracı hedef şeride kilitler.
+     *
+     * Bu metod kritik önem taşır:
+     * 1. Yön kesinlikle hedef yöne ayarlanır
+     * 2. Pozisyon kesinlikle hedef şeridin merkezine sabitlenir
+     * 3. Açı kesinlikle hedef yönün açısına kilitlenir
+     *
+     * Bu sayede dönüş sonrası kayma veya sapma olmaz.
      */
     private void finishTurn() {
         Direction targetDir = originDirection.getTargetDirection(turnDirection);
         direction = targetDir;
         hasTurned = true;
         isTurning = false;
+
+        // Pozisyonu Bezier eğrisinin bitiş noktasına sabitle
+        x = turnEndX;
+        y = turnEndY;
+
+        // Açıyı kesinlikle hedef yöne kilitle
         angle = getInitialAngle(targetDir);
 
-        // Pozisyonu şerit merkezine sabitle (CAR_WIDTH offset'i ile)
+        // Şerit merkezini de düzelt (güvenlik için)
+        // x,y aracın sol üst köşesidir, şerit merkezi - CAR_WIDTH/2 olmalı
         switch (targetDir) {
             case NORTH:
                 x = LANE_NORTH_X - CAR_WIDTH / 2.0;

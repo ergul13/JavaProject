@@ -66,36 +66,36 @@ public enum Direction {
 
     /**
      * Sol taraftaki yönü döndürür (sürücünün soluna dönüş).
-     * Sürücü perspektifinden:
-     * - NORTH'dan (yukarı) gelen → sola dönünce EAST'e (sağ tarafa) gider
-     * - SOUTH'dan (aşağı) gelen → sola dönünce WEST'e (sol tarafa) gider
-     * - EAST'den (sağdan) gelen → sola dönünce SOUTH'a (aşağı) gider
-     * - WEST'den (soldan) gelen → sola dönünce NORTH'a (yukarı) gider
+     * Gerçek trafik kurallarına göre:
+     * - NORTH'dan (yukarı) gelen → sola dönünce WEST'e (sol tarafa) gider
+     * - SOUTH'dan (aşağı) gelen → sola dönünce EAST'e (sağ tarafa) gider
+     * - EAST'den (sağdan) gelen → sola dönünce NORTH'a (yukarı) gider
+     * - WEST'den (soldan) gelen → sola dönünce SOUTH'a (aşağı) gider
      */
     public Direction getLeft() {
         switch (this) {
-            case NORTH: return EAST;   // Yukarı giderken sola dön → Sağa git
-            case SOUTH: return WEST;   // Aşağı giderken sola dön → Sola git
-            case EAST: return SOUTH;   // Sola giderken sola dön → Aşağı git
-            case WEST: return NORTH;   // Sağa giderken sola dön → Yukarı git
+            case NORTH: return WEST;   // Yukarı giderken sola dön → Sola git
+            case SOUTH: return EAST;   // Aşağı giderken sola dön → Sağa git
+            case EAST: return NORTH;   // Sola giderken sola dön → Yukarı git
+            case WEST: return SOUTH;   // Sağa giderken sola dön → Aşağı git
             default: return this;
         }
     }
 
     /**
      * Sağ taraftaki yönü döndürür (sürücünün sağına dönüş).
-     * Sürücü perspektifinden:
-     * - NORTH'dan (yukarı) gelen → sağa dönünce WEST'e (sol tarafa) gider
-     * - SOUTH'dan (aşağı) gelen → sağa dönünce EAST'e (sağ tarafa) gider
-     * - EAST'den (sağdan) gelen → sağa dönünce NORTH'a (yukarı) gider
-     * - WEST'den (soldan) gelen → sağa dönünce SOUTH'a (aşağı) gider
+     * Gerçek trafik kurallarına göre:
+     * - NORTH'dan (yukarı) gelen → sağa dönünce EAST'e (sağ tarafa) gider
+     * - SOUTH'dan (aşağı) gelen → sağa dönünce WEST'e (sol tarafa) gider
+     * - EAST'den (sağdan) gelen → sağa dönünce SOUTH'a (aşağı) gider
+     * - WEST'den (soldan) gelen → sağa dönünce NORTH'a (yukarı) gider
      */
     public Direction getRight() {
         switch (this) {
-            case NORTH: return WEST;   // Yukarı giderken sağa dön → Sola git
-            case SOUTH: return EAST;   // Aşağı giderken sağa dön → Sağa git
-            case EAST: return NORTH;   // Sola giderken sağa dön → Yukarı git
-            case WEST: return SOUTH;   // Sağa giderken sağa dön → Aşağı git
+            case NORTH: return EAST;   // Yukarı giderken sağa dön → Sağa git
+            case SOUTH: return WEST;   // Aşağı giderken sağa dön → Sola git
+            case EAST: return SOUTH;   // Sola giderken sağa dön → Aşağı git
+            case WEST: return NORTH;   // Sağa giderken sağa dön → Yukarı git
             default: return this;
         }
     }
